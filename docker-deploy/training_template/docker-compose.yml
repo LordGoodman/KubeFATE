@@ -111,6 +111,7 @@ services:
     networks:
       - fate-network
 
+    
   client:
     image: "${PREFIX}/client:${TAG}"
     ports:
@@ -123,6 +124,7 @@ services:
       - python
     networks:
       - fate-network
+
 
   mysql:
     image: "mysql:8"
