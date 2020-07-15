@@ -20,6 +20,7 @@ source_parsers = {
     '.md': CommonMarkParser,
 }
 source_suffix = ['.rst', '.md']
+
 # -- Project information -----------------------------------------------------
 
 project = 'KubeFATE'
@@ -66,6 +67,6 @@ exclude_patterns = []
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
 
-
+master_doc = 'index'
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
