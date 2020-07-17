@@ -10,12 +10,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
+import os
+import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
 import sphinx_rtd_theme
 from recommonmark.parser import CommonMarkParser
+# sys.path.insert(0, "/Users/yinhaozheng/go/src/github.com/haozheng95/KubeFATE/fml_manager/fml_manager")
+sys.path.insert(0, os.path.abspath('./../test'))
 source_parsers = {
     '.md': CommonMarkParser,
 }
@@ -37,6 +39,7 @@ release = '1.4.2'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.autodoc"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
