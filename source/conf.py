@@ -16,8 +16,7 @@ import sys
 
 import sphinx_rtd_theme
 from recommonmark.parser import CommonMarkParser
-# sys.path.insert(0, "/Users/yinhaozheng/go/src/github.com/haozheng95/KubeFATE/fml_manager/fml_manager")
-sys.path.insert(0, os.path.abspath('./../test'))
+sys.path.insert(0, "../fml_manager/fml_manager")
 source_parsers = {
     '.md': CommonMarkParser,
 }
