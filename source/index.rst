@@ -20,6 +20,3 @@ Indices and tables
 
 .. toctree::
    :maxdepth: 2
-
-
-   doc/hello
