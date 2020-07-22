@@ -26,6 +26,7 @@ cFateServingServiePort = 8059
 
 cFateClusterCR = "fatecluster"
 
+
 class FMLManager:
     def __init__(self, server_conf=None, log_path="./"):
         self.server_url = None
@@ -36,7 +37,7 @@ class FMLManager:
             self._init_from_config(server_conf)
         elif os.getenv(cFateFlowHostEnv) is not None and os.getenv(cFateFlowHostEnv) != "":
             self._init_from_env()
-        else :
+        else:
             self._init_from_kube_api()
 
         # if the server url is still None, the initialization is failed
@@ -51,7 +52,7 @@ class FMLManager:
         self.serving_url = self.server_conf.get("servings")
         self.http_port = self.server_conf.get("servers").get("fateflow").get("http.port")
         self.server_url = "http://{}:{}/{}".format(self.ip, self.http_port, "v1")
-    
+
     def _init_from_env(self):
         server_host = os.getenv(cFateFlowHostEnv)
         serving_host = os.getenv(cFateServingHostEnv, "")
@@ -60,18 +61,19 @@ class FMLManager:
         self.serving_url = "http://{}".format(serving_host)
 
     def _init_from_kube_api(self):
-        args ="kubectl get {} -A -o json".format(cFateClusterCR).split(" ")
+        args = "kubectl get {} -A -o json".format(cFateClusterCR).split(" ")
         try:
-           data, err = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()
-           data_json = json.loads(data) 
-           if len(data_json["items"]) != 0:
-           # fetch the first fatecluster by default
-               fate_cluster_namespace = data_json["items"][0]["metadata"]["namespace"]
-               self.server_url = "http://{}.{}:{}/{}".format(cFateFlowServieName, fate_cluster_namespace, cFateFlowServiePort, "v1")
-               self.serving_url = "http://{}.{}:{}/{}".format(cFateServingServieName, fate_cluster_namespace, cFateServingServiePort, "v1")
+            data, err = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()
+            data_json = json.loads(data)
+            if len(data_json["items"]) != 0:
+                # fetch the first fatecluster by default
+                fate_cluster_namespace = data_json["items"][0]["metadata"]["namespace"]
+                self.server_url = "http://{}.{}:{}/{}".format(cFateFlowServieName, fate_cluster_namespace,
+                                                              cFateFlowServiePort, "v1")
+                self.serving_url = "http://{}.{}:{}/{}".format(cFateServingServieName, fate_cluster_namespace,
+                                                               cFateServingServiePort, "v1")
         except Exception as e:
             print(e)
-
 
     # Job management
     def submit_job(self, dsl, config):
@@ -97,7 +99,6 @@ class FMLManager:
         else:
             raise Exception('DSL_path cannot be null.')
 
-
         return self.submit_job(dsl_data, config_data)
 
     def query_job_status(self, query_conditions):
@@ -108,7 +109,7 @@ class FMLManager:
                 guest_status = self.query_job(query_conditions).json()["data"][0]["f_status"]
             except Exception as e:
                 print("Failed to fetch status: ", e)
-    
+
             print("Status: %s" % guest_status)
             if guest_status == "failed":
                 job_status = "failed"
@@ -117,7 +118,6 @@ class FMLManager:
                 job_status = "success"
                 break
         return job_status
-
 
     def query_job(self, query_conditions):
         response = requests.post("/".join([self.server_url, "job", "query"]), json=query_conditions)
@@ -152,12 +152,14 @@ class FMLManager:
         tar_file_name = 'job_{}_log.tar.gz'.format(job_id)
         extract_dir = os.path.join(self.log_path, 'job_{}_log'.format(job_id))
         with closing(requests.get("/".join([self.server_url, "job", "log"]), json=data,
-                                      stream=True)) as response:
+                                  stream=True)) as response:
             if response.status_code == 200:
-                self.__download_from_request(http_response=response, tar_file_name=tar_file_name, extract_dir=extract_dir)
+                self.__download_from_request(http_response=response, tar_file_name=tar_file_name,
+                                             extract_dir=extract_dir)
                 response = {'retcode': 0,
                             'directory': extract_dir,
-                            'retmsg': 'download successfully, please check {} directory, file name is {}'.format(extract_dir, tar_file_name)}
+                            'retmsg': 'download successfully, please check {} directory, file name is {}'.format(
+                                extract_dir, tar_file_name)}
 
                 return self.prettify(response, True)
             else:
@@ -212,7 +214,7 @@ class FMLManager:
         return self.prettify(response)
 
     # The data is download to fateflow. FATE not ready to download to local.
-    def download_data(self, namespace, table_name, filename, work_mode, delimitor, output_folder = "./"):
+    def download_data(self, namespace, table_name, filename, work_mode, delimitor, output_folder="./"):
         DEFAULT_DATA_FOLDER = "/data/projects/fate/python/download_dir"
         output_path = "{}/{}".format(DEFAULT_DATA_FOLDER, filename)
         post_data = {
@@ -228,7 +230,7 @@ class FMLManager:
             output = json.loads(response.content)
             job_id = output["jobId"]
             query_condition = {
-                "job_id":job_id
+                "job_id": job_id
             }
             for i in range(500):
                 time.sleep(1)
@@ -318,7 +320,9 @@ class FMLManager:
 
         return self.prettify(model, True)
 
-    def offline_predict_on_dataset(self, is_vertical, initiator_party_role, initiator_party_id, work_mode, model_id, model_version, federated_roles, guest_data_name = "", guest_data_namespace = "", host_data_name = "", host_data_namespace = ""):
+    def offline_predict_on_dataset(self, is_vertical, initiator_party_role, initiator_party_id, work_mode, model_id,
+                                   model_version, federated_roles, guest_data_name="", guest_data_namespace="",
+                                   host_data_name="", host_data_namespace=""):
         if is_vertical:
             print("This API is not support vertical federated machine learning yet. ")
             return
@@ -420,6 +424,7 @@ class FMLManager:
 
         The metric_name is "loss" and metric_namespace is "train"
     """
+
     def track_component_metric_data(self, job_id, role, party_id, component_name, metric_name, metric_namespace):
         post_data = {
             "job_id": job_id,
@@ -452,7 +457,8 @@ class FMLManager:
             "component_name": component_name
         }
 
-        response = requests.post("/".join([self.server_url, "tracking", "component", "output", "model"]), json=post_data)
+        response = requests.post("/".join([self.server_url, "tracking", "component", "output", "model"]),
+                                 json=post_data)
         return self.prettify(response, True)
 
     def track_component_output_data(self, job_id, role, party_id, component_name):
@@ -479,10 +485,10 @@ class FMLManager:
         return response
 
     def __download_data_from_request(self, http_response, output):
-     with open(output, 'wb') as fw:
-        for chunk in http_response.iter_content(1024):
-            if chunk:
-                fw.write(chunk)
+        with open(output, 'wb') as fw:
+            for chunk in http_response.iter_content(1024):
+                if chunk:
+                    fw.write(chunk)
 
     def __download_from_request(self, http_response, tar_file_name, extract_dir):
         with open(tar_file_name, 'wb') as fw:
@@ -495,6 +501,7 @@ class FMLManager:
             tar.extract(file_name, extract_dir)
         tar.close()
         os.remove(tar_file_name)
+
 
 class HttpDownloader:
     def __init__(self, url):

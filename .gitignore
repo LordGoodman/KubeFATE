@@ -6,4 +6,5 @@
 *.exe
 build/
 dist/
+test/
 *.egg-info

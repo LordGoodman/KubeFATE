@@ -22,4 +22,4 @@ Indices and tables
    :maxdepth: 2
 
 
-   hello
+   doc/hello
