@@ -12,6 +12,7 @@
 
 import os, subprocess, json, tempfile
 
+
 class ClusterManager:
     def __init__(self, cluster_namespace, cluster_name):
         self.namespace = cluster_namespace
@@ -19,21 +20,21 @@ class ClusterManager:
 
     # get configmap in dict
     def fetch_config_map(self, component):
-       args ="kubectl get configmap {} -n {} -o json".format(component, self.namespace).split(" ") 
-       try:
-           data, err = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()
-           return json.loads(data)
-       except Exception as error:
-           print(error)
-    
+        args = "kubectl get configmap {} -n {} -o json".format(component, self.namespace).split(" ")
+        try:
+            data, err = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()
+            return json.loads(data)
+        except Exception as error:
+            print(error)
+
     # get route table in dict
     def fetch_route_table(self, configmap):
-       route_table_json = json.loads(configmap["data"]["route_table.json"]) 
-       return route_table_json 
-    
+        route_table_json = json.loads(configmap["data"]["route_table.json"])
+        return route_table_json
+
     def update_config_map(self, configmap, route_table):
         configmap["data"]["route_table.json"] = json.dumps(route_table)
-    
+
     def patch_config_map(self, configmap, component):
         args = "kubectl patch configmap {} -n {} --patch".format(component, self.namespace).split(" ")
         args.append(json.dumps(configmap))
@@ -63,18 +64,19 @@ class ClusterManager:
 
     def get_entry_point(self):
         get_address = "kubectl get nodes -o jsonpath=\'{$.items[0].status.addresses[?(@.type==\'InternalIP\')].address}\'"
-        get_port = "kubectl get service rollsite -n {0} -o jsonpath=\'{{.spec.ports[0].nodePort}}\'".format(self.namespace)
+        get_port = "kubectl get service rollsite -n {0} -o jsonpath=\'{{.spec.ports[0].nodePort}}\'".format(
+            self.namespace)
 
         ip = ""
         port = ""
 
         try:
-           ip, err = subprocess.Popen(get_address.split(" "), stdout=subprocess.PIPE).communicate()
-           port, err = subprocess.Popen(get_port.split(" "), stdout=subprocess.PIPE).communicate()
+            ip, err = subprocess.Popen(get_address.split(" "), stdout=subprocess.PIPE).communicate()
+            port, err = subprocess.Popen(get_port.split(" "), stdout=subprocess.PIPE).communicate()
         except Exception as error:
             print(error)
 
         if ip == "" or port == "":
-            raise(Exception("Unable to get entrypoint"))
+            raise (Exception("Unable to get entrypoint"))
 
         return "{}:{}".format(ip.decode("utf-8").replace("'", ""), port.decode("utf-8").replace("'", ""))
