@@ -238,8 +238,6 @@ Each parameter set for host should also be list in a list. The number of element
 The parameters set in algorithm parameters need not be copied into host role parameters. Algorithm parameters will be copied for every party.
 """
 
-
-
 __mtime__ = '2020-07-24'
 
 import json
