@@ -157,6 +157,8 @@ class PartyBuilder():
 
 
 class RouteTable():
+    """RouteTable is used to communicate with other parties"""
+
     def __init__(self) -> None:
         """ Return instance with empty route table
         """
