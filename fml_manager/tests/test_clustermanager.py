@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # define normal party
     party = PartyBuilder().with_id(
-        '9999').with_ip('192.168.2.2').with_port('30010').build()
+        '9999').with_ip('192.168.2.2').with_port(30010).build()
 
     # append normal party to route table
     route_table.add_party(party)
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # define exchange
     party = PartyBuilder().with_id('any').with_ip(
-        '192.168.1.2').with_port('30009').with_type(PartyType.EXCHANGE).build()
+        '192.168.1.2').with_port(30009).with_type(PartyType.EXCHANGE).build()
 
     # append exchange to route table
     route_table.add_party(party)
