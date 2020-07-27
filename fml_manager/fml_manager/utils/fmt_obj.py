@@ -328,11 +328,13 @@ class Builder(Dict):
     def __setvalue(self, name):
         self = self
 
-        def foo(value):
-            if self.__root__ is None:
-                self[name] = value
-            else:
-                self[self.__root__][name] = value
+        def foo(*args):
+            if len(args) == 1:
+                value = args[0]
+                if self.__root__ is None:
+                    self[name] = value
+                else:
+                    self[self.__root__][name] = value
             return self
 
         return foo
@@ -399,7 +401,227 @@ class ComponentBuilder(Builder):
     __root__ = "components"
 
 
+config = '''
+{
+    "initiator": {
+        "role": "guest",
+        "party_id": 10000
+    },
+    "job_parameters": {
+        "work_mode": 1
+    },
+    "role": {
+        "guest": [10000],
+        "host": [9999],
+        "arbiter": [9999]
+    },
+    "role_parameters": {
+        "guest": {
+            "args": {
+                "data": {
+                    "train_data": [{"name": "breast_b", "namespace": "fate_flow_test_breast"}]
+                }
+            },
+            "dataio_0":{
+                "with_label": [true],
+                "label_name": ["y"],
+                "label_type": ["int"],
+                "output_format": ["dense"]
+            }
+        },
+        "host": {
+            "args": {
+                "data": {
+                    "train_data": [{"name": "breast_a", "namespace": "fate_flow_test_breast"}]
+                }
+            },
+             "dataio_0":{
+                "with_label": [false],
+                "output_format": ["dense"]
+            }
+        }
+    },
+    "algorithm_parameters": {
+        "hetero_lr_0": {
+            "penalty": "L2",
+            "optimizer": "rmsprop",
+            "eps": 1e-5,
+            "alpha": 0.01,
+            "max_iter": 3,
+            "converge_func": "diff",
+            "batch_size": 320,
+            "learning_rate": 0.15,
+            "init_param": {
+                                "init_method": "random_uniform"
+            }
+        }
+    }
+}
+'''
+
+
+class InitiatorBuilder(Builder):
+
+    def __init__(self, *args, **kwargs):
+        super(InitiatorBuilder, self).__init__(*args, **kwargs)
+        self["role"] = None
+        self["party_id"] = None
+
+
+class JobParameterBuilder(Builder):
+    def __init__(self, *args, **kwargs):
+        super(JobParameterBuilder, self).__init__(*args, **kwargs)
+        self["work_mode"] = None
+
+
+class AlgorithmParameterBuilder(Builder):
+    pass
+
+
+class RoleParameterBuilder(Builder):
+    pass
+
+
+class HostBuilder(Builder):
+    def __init__(self, *args, **kwargs):
+        super(HostBuilder, self).__init__(*args, **kwargs)
+        self["args"] = Builder()
+        self["args"]["data"] = Builder()
+        self["args"]["data"]["train_data"] = []
+
+        self["dataio_0"] = Builder()
+        self["dataio_0"]["with_label"] = []
+        self["dataio_0"]["output_format"] = []
+
+    def train_data(self, value):
+        self["args"]["data"]["train_data"].append(value)
+        return self
+
+    def with_label(self, value):
+        self["dataio_0"]["with_label"].append(value)
+        return self
+
+    def output_format(self, value):
+        self["dataio_0"]["output_format"].append(value)
+        return self
+
+
+class GuestBuilder(HostBuilder):
+    def __init__(self, *args, **kwargs):
+        super(GuestBuilder, self).__init__(*args, **kwargs)
+        self["dataio_0"]["label_name"] = []
+        self["dataio_0"]["label_type"] = []
+
+    def label_name(self, value):
+        self["dataio_0"]["label_name"].append(value)
+        return self
+
+    def label_type(self, value):
+        self["dataio_0"]["label_type"].append(value)
+        return self
+
+
+class RoleBuilder(Builder):
+    def __init__(self, *args, **kwargs):
+        super(RoleBuilder, self).__init__(*args, **kwargs)
+        self["guest"] = []
+        self["host"] = []
+        self["arbiter"] = []
+
+    def guest(self, value):
+        self["guest"].append(value)
+        return self
+
+    def host(self, value):
+        self["host"].append(value)
+        return self
+
+    def arbiter(self, value):
+        self["arbiter"].append(value)
+        return self
+
+
+class HeteroLrBuilder(Builder):
+
+    def __init__(self, *args, **kwargs):
+        super(HeteroLrBuilder, self).__init__(*args, **kwargs)
+        self["penalty"] = None
+        self["optimizer"] = None
+        self["eps"] = None
+        self["alpha"] = None
+        self["max_iter"] = None
+        self["converge_func"] = None
+        self["batch_size"] = None
+        self["learning_rate"] = None
+        self["init_param"] = Builder()
+        self["init_param"]["init_method"] = None
+
+    def init_method(self, value):
+        self["init_param"]["init_method"] = value
+        return self
+
+
 if __name__ == '__main__':
+    configObj = Builder(). \
+        initiator(
+        InitiatorBuilder()
+            .role("guest")
+            .party_id(10000)
+    ). \
+        job_parameters(
+        JobParameterBuilder()
+            .work_mode(1)
+    ). \
+        role(
+        RoleBuilder()
+            .guest(10000)
+            .host(9999)
+            .arbiter(9999)
+    ). \
+        role_parameters(
+        RoleParameterBuilder()
+            .guest(
+            GuestBuilder()
+                .args()
+                .data()
+                .train_data(
+                Builder()
+                    .name("breast_b")
+                    .namespace("fate_flow_test_breast")
+            ).dataio_0()
+                .with_label(True)
+                .label_name("y")
+                .label_type("int")
+                .output_format("dense")
+        ).host(
+            HostBuilder().args()
+                .data()
+                .train_data(
+                Builder()
+                    .name("breast_a")
+                    .namespace("fate_flow_test_breast")
+            ).dataio_0()
+                .with_label(False)
+                .output_format("dense")
+        )
+    ). \
+        algorithm_parameters(
+        AlgorithmParameterBuilder()
+            .hetero_lr_0(
+            HeteroLrBuilder()
+                .penalty("L2")
+                .optimizer("rmsprop")
+                .eps(1e-5)
+                .alpha(0.01)
+                .max_iter(3)
+                .converge_func("diff")
+                .batch_size(320)
+                .learning_rate(0.15)
+                .init_param().init_method("random_uniform")
+        )
+    )
+
+    print(json.dumps(configObj, default=lambda o: o.__dict__, indent=2, ensure_ascii=False))
     fmtObj = ComponentBuilder().dataio_0(
         DataIoBuilder()
             .module("DataIO")
