@@ -19,7 +19,17 @@ from fml_manager.utils.fate_builders import RouteTable
 
 
 class ClusterManager:
-    def __init__(self, cluster_namespace, cluster_name):
+    """ClusterManager is used to manage FATE cluster"""
+
+    def __init__(self, cluster_namespace, cluster_name=None):
+        """ Init the ClusterManager instance
+
+        :param cluster_namespace: Which namespace the cluster is belonged to
+        :type cluster_namespace: string
+        :param cluster_name: The name of fate cluster, no need to provide in most cases
+        :type cluster_name: string
+
+        """
         self.namespace = cluster_namespace
         self.name = cluster_name
 
@@ -54,6 +64,11 @@ class ClusterManager:
             print(error)
 
     def get_route_table(self):
+        """ Fetch route table from configmap
+
+        :rtype: RouteTable
+
+        """
         # get configmap in dict
         configmap = self.fetch_config_map("rollsite-config")
 
@@ -64,6 +79,12 @@ class ClusterManager:
         return route_table_ins
 
     def set_route_table(self, route_table):
+        """ Patch configmap with route table
+
+        :param route_table: route table to patch configmap
+        :type route_table: RouteTable
+
+        """
         # get configmap in dict
         configmap = self.fetch_config_map("rollsite-config")
 
@@ -74,6 +95,11 @@ class ClusterManager:
         self.patch_config_map(configmap, "rollsite-config")
 
     def get_entry_point(self):
+        """ Return the entrypoint of FATE cluster
+
+        :rtype: string
+
+        """
         get_address = "kubectl get nodes -o jsonpath=\'{$.items[0].status.addresses[?(@.type==\'InternalIP\')].address}\'"
         get_port = "kubectl get service rollsite -n {0} -o jsonpath=\'{{.spec.ports[0].nodePort}}\'".format(
             self.namespace)
