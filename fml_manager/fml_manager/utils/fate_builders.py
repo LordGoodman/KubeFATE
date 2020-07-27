@@ -72,13 +72,15 @@ class RouteTable():
     def __init__(self) -> None:
         self._route_table = None
 
-    def add_party(self, party) -> None:
-        self._route_table['route_table'][party.get_id()] = party.to_entry_point(
-        )
+    def add_party(self, *parties) -> None:
+        for party in parties:
+            self._route_table['route_table'][party.get_id()] = party.to_entry_point(
+            )
 
-    def update_party(self, party) -> None:
-        self._route_table['route_table'][party.get_id()] = party.to_entry_point(
-        )
+    def update_party(self, *parties) -> None:
+        for party in parties:
+            self._route_table['route_table'][party.get_id()] = party.to_entry_point(
+            )
 
     def remove_party(self, *party_ids) -> None:
         for party_id in party_ids:
