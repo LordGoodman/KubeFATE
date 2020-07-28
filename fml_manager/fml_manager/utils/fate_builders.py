@@ -272,3 +272,193 @@ class QueryCondition():
     def __str__(self):
 
         return self.get_job_id().__str__()
+
+
+class Component():
+    # TODO: add setter/getter
+    """Component is used to describe steps in a pipline"""
+
+    def __init__(self):
+        """ Init an empty component
+        """
+        self._name = None
+        self._module = None
+
+        #: Need deploy of data io
+        self._need_deploy = False
+
+        #: The input part contains two sub structures, for more details please refer to `DSL definition <https://github.com/FederatedAI/FATE/blob/master/doc/dsl_conf_setting_guide.rst>`_
+        #: They should be list type
+        self._input_data = None
+        self._input_train_data = None
+        self._input_eval_data = None
+        self._input_model = None
+        self._input_isometric_model = None
+
+        #: The output part also contains two sub structures, for more details please refer to `DSL definition <https://github.com/FederatedAI/FATE/blob/master/doc/dsl_conf_setting_guide.rst>`_
+        #: They should be list type
+        self._output_data = None
+        self._output_model = None
+
+    def to_dict(self):
+        """ Convert Component to dictionary
+
+        :rtype: dict
+
+        """
+        name = self._name
+        body = {}
+        module = {'module': self._module}
+        inputs = {'input': {}}
+        outputs = {'output': {}}
+        need_deploy = {'need_deploy': self._need_deploy}
+
+        # check all input
+        if self._input_data != None:
+            inputs['input']['data'] = {
+                'data': self._input_data
+            }
+        elif self._input_train_data != None:
+            inputs['input']['data'] = {
+                'train_data': self._input_train_data
+            }
+        elif self._input_eval_data != None:
+            inputs['input']['data'] = {
+                'eval_data': self._input_eval_data
+            }
+
+        if self._input_model != None:
+            inputs['input']['model'] = self._input_model
+        elif self._input_isometric_model != None:
+            inputs['input']['isometric_model'] = self._input_isometric_model
+
+        if self._output_data != None:
+            outputs['output']['data'] = self._output_data
+        if self._output_model != None:
+            outputs['output']['model'] = self._output_model
+
+        body.update(module)
+        body.update(inputs)
+        body.update(outputs)
+        body.update(need_deploy)
+
+        return {name: body}
+
+
+class ComponentBuilder():
+    """ComponentBuilder is used to build Component instance"""
+
+    def __init__(self):
+        """ Init ComponentBuilder instance
+        """
+
+        self.reset()
+
+    def reset(self):
+        self._component = Component()
+
+    def with_need_deploy(self, need_deploy):
+        """ Set 'need_deploy' for DataIO module
+
+        :param need_deploy: Value of need_deploy
+        :type need_deploy: bool
+
+        """
+        self._component._need_deploy = need_deploy
+        return self
+
+    def with_name(self, name):
+        """ Set component name
+
+        :param name: name of the component
+        :type name: string
+
+        """
+        self._component._name = name
+        return self
+
+    def with_module(self, module):
+        """ Set component module
+
+        :param module: The available module in FATE, for more details please refer to `Modules <https://github.com/FederatedAI/FATE/tree/master/federatedml>`
+        :type module: string
+        """
+        self._component._module = module
+        return self
+
+    def with_input_data(self, *data):
+        """ Set input data
+        """
+        self._component._input_data = [d for d in data]
+        return self
+
+    def with_input_train_data(self, *train_data):
+        """ Set input data for training
+        """
+        self._component._input_train_data = [d for d in train_data]
+        return self
+
+    def with_input_eval_data(self, *eval_data):
+        """ Set input data for evaluation
+        """
+        self._component._input_eval_data = [d for d in eval_data]
+        return self
+
+    def with_input_model(self, *model):
+        """ Set input model
+        """
+        self._component._input_model = [d for d in module]
+        return self
+
+    def with_input_isometric_model(self, *isometric_model):
+        """ Set input isometric model
+        """
+        self._component._input_isometric_model = [d for d in isometric_model]
+        return self
+
+    def with_output_data(self, *data):
+        """ Set output data
+        """
+        self._component._output_data = [d for d in data]
+        return self
+
+    def with_output_model(self, *model):
+        """ Set output model
+        """
+
+        self._component._output_model = [d for d in model]
+        return self
+
+    def build(self):
+        component = self._component
+        self.reset()
+        return component
+
+
+class Pipline():
+    """Pipline is used to described pipline in FATE"""
+
+    def __init__(self):
+        self._name = 'components'
+        self._components = {}
+
+    def to_dict(self):
+        return {self._name: self._components}
+
+
+class PiplineBuilder():
+    """PiplineBuilder is used to build pipline instance"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self._pipline = Pipline()
+
+    def with_components(self, *components):
+        for component in components:
+            self._pipline._components.update(component.to_dict())
+        return self
+
+    def build(self):
+        return self._pipline
