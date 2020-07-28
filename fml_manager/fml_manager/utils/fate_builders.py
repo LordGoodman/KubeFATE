@@ -108,8 +108,10 @@ class PartyBuilder():
 
     def with_id(self, party_id):
         """ Update ID
+
         :param party_id: The ID of party
         :type party_id: string
+
         """
 
         self._party.set_id(party_id)
@@ -117,8 +119,10 @@ class PartyBuilder():
 
     def with_ip(self, party_ip):
         """ Update IP
+
         :param party_ip: The IP of party
         :type party_ip: string
+
         """
 
         self._party.set_ip(party_ip)
@@ -126,8 +130,10 @@ class PartyBuilder():
 
     def with_port(self, party_port):
         """ Update port
+
         :param party_port: The port of party
         :type party_port: int
+
         """
 
         self._party.set_port(party_port)
@@ -135,8 +141,10 @@ class PartyBuilder():
 
     def with_type(self, party_type):
         """ Update type
+
         :param party_type: The type of party
         :type party_type: PartyType
+
         """
 
         self._party.set_type(party_type)
@@ -144,7 +152,9 @@ class PartyBuilder():
 
     def build(self):
         """ Return party instance with config
+
         :rtype: Party
+
         """
         party = self._party
         self.reset()
@@ -168,8 +178,10 @@ class RouteTable():
 
     def add_party(self, *parties) -> None:
         """ Append parties to route table
+
         :param parties: A list of party instance
         :type parties: list
+
         """
 
         for party in parties:
@@ -178,8 +190,10 @@ class RouteTable():
 
     def update_party(self, *parties) -> None:
         """ Update parties of route table
+
         :param parties: A list of party instance
         :type parties: list
+
         """
 
         for party in parties:
@@ -188,8 +202,10 @@ class RouteTable():
 
     def remove_party(self, *party_ids) -> None:
         """ Remove parties from route table
+
         :param parties: A list of party ID
         :type parties: list
+
         """
 
         for party_id in party_ids:
@@ -198,21 +214,61 @@ class RouteTable():
 
     def get_party(self) -> dict:
         """ List all parties
+
         :rtype: dict
+
         """
         return self._route_table['route_table']
 
     def from_dict(self, route_table):
         """ Load route table config from dict
+
         :param route_table: The underlying route table
         :type route_table: dict
         :rtype: RouteTable
+
         """
         self._route_table = route_table
         return self
 
     def to_dict(self) -> dict:
         """ Return underlying route table
+
         :rtype: dict
+
         """
         return self._route_table
+
+
+class QueryCondition():
+    """QueryCondition is context for job query"""
+
+    def __init__(self, job_id):
+        """ Init QueryCondition with job id
+
+        :param job_id: The uuid of job
+        :type job_id: string
+
+        """
+        self._job_id = job_id
+
+    def get_job_id(self):
+        """ Fetch the job id
+
+        :rtype: dict
+
+        """
+        return {'job_id': self._job_id}
+
+    def set_job_id(self, job_id):
+        """ Set job id
+
+        :param job_id: The uuid of job
+        :type job_id: string
+
+        """
+        self._job_id = job_id
+
+    def __str__(self):
+
+        return self.get_job_id().__str__()
