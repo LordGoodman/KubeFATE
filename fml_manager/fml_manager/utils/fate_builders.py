@@ -817,17 +817,23 @@ class AlgorithmParametersBuilder(object):
         self.algorithm = algorithm
         return self
 
-    def with_parameters(self, parameters: dict) -> object:
+    def with_parameters(self, *parameters) -> object:
+        """
+
+        :param parameters: The available parameters in FATE, for more details please refer to `parameters <https://github.com/FederatedAI/FATE/blob/master/federatedml/conf/default_runtime_conf/logistic_regression_param.json>`
+        :return:
+        """
         self.parameters = parameters
         return self
 
     def build(self):
         if self.algorithm is None:
-            body = self.parameters
-            return body
+            raise Exception("algorithm Can't for None")
 
         body = dict()
-        body[self.algorithm] = self.parameters
+        body[self.algorithm] = dict()
+        for item in self.parameters:
+            deepSearch(body[self.algorithm], item)
         return body
 
 
