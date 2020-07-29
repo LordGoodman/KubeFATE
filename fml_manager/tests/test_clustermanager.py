@@ -1,5 +1,5 @@
 # Copyright 2019-2020 VMware, Inc.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # you may obtain a copy of the License at
@@ -11,15 +11,39 @@
 # limitations under the License.
 
 from fml_manager import ClusterManager
+from fml_manager import PartyBuilder, PartyType
+
 if __name__ == "__main__":
     # init the cluster manager
-    cluster_manager = ClusterManager("fate-10000", "fatesample")
+    cluster_manager = ClusterManager("fate-10000", "fate")
 
     # get route table
-    route_table=cluster_manager.get_route_table()
-    route_table["route_table"]["9999"] = {'default': [{'ip': '192.168.0.1', 'port': 9370}]}
+    route_table = cluster_manager.get_route_table()
 
-    # update route table
+    # show all party
+    print(route_table.get_party())
+
+    # delete route table party
+    route_table.remove_party('9999', '8888')
+    print(route_table.get_party())
+
+    # define normal party
+    party = PartyBuilder().with_id(
+        '9999').with_ip('192.168.2.2').with_port(30010).build()
+
+    # append normal party to route table
+    route_table.add_party(party)
+    print(route_table.get_party())
+
+    # define exchange
+    party = PartyBuilder().with_id('any').with_ip(
+        '192.168.1.2').with_port(30009).with_type(PartyType.EXCHANGE).build()
+
+    # append exchange to route table
+    route_table.add_party(party)
+    print(route_table.get_party())
+
+    # update route table of configmap
     cluster_manager.set_route_table(route_table)
 
     # get entrypoint
