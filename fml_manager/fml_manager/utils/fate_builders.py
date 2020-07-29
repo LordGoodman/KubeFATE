@@ -823,7 +823,8 @@ class AlgorithmParametersBuilder(object):
 
     def build(self):
         if self.algorithm is None:
-            raise Exception("algorithm Can't for None")
+            body = self.parameters
+            return body
 
         body = dict()
         body[self.algorithm] = self.parameters
