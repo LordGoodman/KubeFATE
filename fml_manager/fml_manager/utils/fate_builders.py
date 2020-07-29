@@ -462,3 +462,436 @@ class PiplineBuilder():
 
     def build(self):
         return self._pipline
+    
+    
+    
+class Config(object):
+
+    def __init__(self):
+        self.initiator = None
+        self.job_parameters = None
+        self.role = None
+        self.role_parameters = None
+        self.algorithm_parameters = None
+
+    def to_dict(self) -> dict:
+        body = dict()
+        if self.initiator is None:
+            pass
+        else:
+            body["initiator"] = self.initiator
+
+        if self.job_parameters is None:
+            pass
+        else:
+            body["job_parameters"] = self.job_parameters
+
+        if self.role is None:
+            pass
+        else:
+            body["role"] = self.role
+
+        if self.role_parameters is None:
+            pass
+        else:
+            body["role_parameters"] = self.role_parameters
+
+        if self.algorithm_parameters is None:
+            pass
+        else:
+            body["algorithm_parameters"] = self.algorithm_parameters
+        return body
+
+
+class InitiatorBuilder(object):
+    def __init__(self):
+        self.role = None
+        self.party_id = None
+
+    def with_role(self, role: str) -> object:
+        """
+
+        :param role:
+        :return:
+        """
+        self.role = role
+        return self
+
+    def with_party_id(self, part_id: int) -> object:
+        """
+
+        :param part_id:
+        :return:
+        """
+        self.party_id = part_id
+        return self
+
+    def build(self) -> dict:
+        """
+
+        :return:
+        """
+        body = dict()
+        if self.role is None:
+            pass
+        else:
+            body["role"] = self.role
+
+        if self.party_id is None:
+            pass
+        else:
+            body["part_id"] = self.party_id
+
+        return body
+
+
+class JobParameterBuilder(object):
+    def __init__(self):
+        self.work_mode = None
+
+    def with_work_mode(self, work_mode: int) -> object:
+        """
+
+        :param work_mode:
+        :return:
+        """
+        self.work_mode = work_mode
+        return self
+
+    def build(self) -> dict:
+        """
+
+        :return:
+        """
+        body = dict()
+        if self.work_mode is None:
+            pass
+        else:
+            body["work_mode"] = self.work_mode
+        return body
+
+
+class RoleBuilder(object):
+    def __init__(self):
+        self.guest = []
+        self.host = []
+        self.arbiter = []
+
+    def with_guest(self, guest: int) -> object:
+        """
+
+        :param guest:
+        :return:
+        """
+        self.guest.append(guest)
+        return self
+
+    def with_host(self, host: int) -> object:
+        """
+
+        :param host:
+        :return:
+        """
+        self.host.append(host)
+        return self
+
+    def with_arbiter(self, arbiter: int) -> object:
+        """
+
+        :param arbiter:
+        :return:
+        """
+        self.arbiter.append(arbiter)
+        return self
+
+    def build(self) -> dict:
+        """
+
+        :return:
+        """
+        body = dict()
+        if len(self.guest) != 0:
+            body["guest"] = self.guest
+        if len(self.host) != 0:
+            body["host"] = self.host
+        if len(self.arbiter) != 0:
+            body["arbiter"] = self.arbiter
+        return body
+
+
+def deepSearch(dict1, dict2):
+    for key in dict2.keys():
+        if key not in dict1.keys():
+            dict1[key] = dict2[key]
+        else:
+            deepSearch(dict1[key], dict2[key])
+
+
+class TrainData(dict):
+    """
+    {"name": "breast_b", "namespace": "fate_flow_test_breast"}
+    """
+    pass
+
+
+class RoleParameterBuilder(object):
+    def __init__(self):
+        self.guest = None
+        self.guest_args = None
+        self.guest_args_data = None
+        self.guest_args_data_train_data = []
+        self.guest_dataio_0 = None
+        self.guest_dataio_0_with_label = []
+        self.guest_dataio_0_label_name = []
+        self.guest_dataio_0_label_type = []
+        self.guest_dataio_0_output_format = []
+
+        self.host = None
+        self.host_args = None
+        self.host_args_data = None
+        self.host_args_data_train_data = []
+        self.host_dataio_0 = None
+        self.host_dataio_0_with_label = []
+        self.host_dataio_0_output_format = []
+
+    def with_guest_args_data_train_data(self, train_data: TrainData) -> object:
+        """
+        :param train_data:
+        :return:
+        """
+        self.guest_args_data_train_data.append(train_data)
+        return self
+
+    def with_guest_dataio_0_with_label(self, label: bool) -> object:
+        """
+
+        :param label:
+        :return:
+        """
+        self.guest_dataio_0_with_label.append(label)
+        return self
+
+    def with_guest_dataio_0_label_name(self, name: str) -> object:
+        """
+
+        :param name:
+        :return:
+        """
+        self.guest_dataio_0_label_name.append(name)
+        return self
+
+    def with_guest_dataio_0_label_type(self, type: str) -> object:
+        """
+
+        :param type:
+        :return:
+        """
+        self.guest_dataio_0_label_type.append(type)
+        return self
+
+    def with_guest_dataio_0_output_format(self, format: str) -> object:
+        """
+
+        :param format:
+        :return:
+        """
+        self.guest_dataio_0_output_format.append(format)
+        return self
+
+    def with_host_args_data_train_data(self, train_data: TrainData) -> object:
+        """
+        :param train_data:
+        :return:
+        """
+        self.host_args_data_train_data.append(train_data)
+        return self
+
+    def with_host_dataio_0_with_label(self, label: bool) -> object:
+        """
+
+        :param label:
+        :return:
+        """
+        self.host_dataio_0_with_label.append(label)
+        return self
+
+    def with_host_dataio_0_output_format(self, format: str) -> object:
+        """
+
+        :param format:
+        :return:
+        """
+        self.host_dataio_0_output_format.append(format)
+        return self
+
+    def build(self) -> dict:
+        """
+
+        :return:
+        """
+        body = dict()
+        guest = dict()
+        host = dict()
+        if self.guest_args_data_train_data is None:
+            pass
+        else:
+            temp = dict(
+                args=dict(
+                    data=dict(
+                        train_data=self.guest_args_data_train_data
+                    )
+                )
+            )
+            deepSearch(guest, temp)
+        if len(self.guest_dataio_0_with_label) != 0:
+            temp = dict(
+                dataio_0=dict(
+                    with_label=self.guest_dataio_0_with_label
+                )
+            )
+            deepSearch(guest, temp)
+
+        if len(self.guest_dataio_0_label_name) != 0:
+            temp = dict(
+                dataio_0=dict(
+                    label_name=self.guest_dataio_0_label_name
+                )
+            )
+            deepSearch(guest, temp)
+
+        if len(self.guest_dataio_0_label_type) != 0:
+            temp = dict(
+                dataio_0=dict(
+                    label_type=self.guest_dataio_0_label_type
+                )
+            )
+            deepSearch(guest, temp)
+
+        if len(self.guest_dataio_0_output_format) != 0:
+            temp = dict(
+                dataio_0=dict(
+                    output_format=self.guest_dataio_0_output_format
+                )
+            )
+            deepSearch(guest, temp)
+
+        if self.host_args_data_train_data is None:
+            pass
+        else:
+            temp = dict(
+                args=dict(
+                    data=dict(
+                        train_data=self.host_args_data_train_data
+                    )
+                )
+            )
+            deepSearch(host, temp)
+        if len(self.host_dataio_0_with_label) != 0:
+            temp = dict(
+                dataio_0=dict(
+                    with_label=self.host_dataio_0_with_label
+                )
+            )
+            deepSearch(host, temp)
+
+        if len(self.host_dataio_0_output_format) != 0:
+            temp = dict(
+                dataio_0=dict(
+                    output_format=self.host_dataio_0_output_format
+                )
+            )
+            deepSearch(host, temp)
+
+        body["host"] = host
+        body["guest"] = guest
+        return body
+
+
+class AlgorithmParametersBuilder(object):
+
+    def __init__(self):
+        self.algorithm = None
+        self.parameters = None
+
+    def with_algorithm(self, algorithm: str) -> object:
+        self.algorithm = algorithm
+        return self
+
+    def with_parameters(self, *parameters) -> object:
+        """
+
+        :param parameters: The available parameters in FATE, for more details please refer to `parameters <https://github.com/FederatedAI/FATE/blob/master/federatedml/conf/default_runtime_conf/logistic_regression_param.json>`
+        :return:
+        """
+        self.parameters = parameters
+        return self
+
+    def build(self):
+        if self.algorithm is None:
+            raise Exception("algorithm Can't for None")
+
+        body = dict()
+        body[self.algorithm] = dict()
+        for item in self.parameters:
+            deepSearch(body[self.algorithm], item)
+        return body
+
+
+class ConfigBuilder(object):
+    def __init__(self):
+        self.initiator = None
+        self.job_parameters = None
+        self.role = None
+        self.role_parameters = None
+        self.algorithm_parameters = None
+
+    def with_initiator(self, initiator: InitiatorBuilder) -> object:
+        self.initiator = initiator
+        return self
+
+    def with_job_parameters(self, job_parameters: JobParameterBuilder) -> object:
+        self.job_parameters = job_parameters
+        return self
+
+    def with_role(self, role: RoleBuilder) -> object:
+        self.role = role
+        return self
+
+    def with_role_parameters(self, role_parameters: RoleParameterBuilder) -> object:
+        self.role_parameters = role_parameters
+        return self
+
+    def with_algorithm_parameters(self, algorithm_parameters: AlgorithmParametersBuilder) -> object:
+        self.algorithm_parameters = algorithm_parameters
+        return self
+
+    def build(self) -> dict:
+        body = Config()
+        if self.initiator is None:
+            pass
+        else:
+            body.initiator = self.initiator.build()
+
+        if self.job_parameters is None:
+            pass
+        else:
+            body.job_parameters = self.job_parameters.build()
+
+        if self.role is None:
+            pass
+        else:
+            body.role = self.role.build()
+
+        if self.role_parameters is None:
+            pass
+        else:
+            body.role_parameters = self.role_parameters.build()
+
+        if self.algorithm_parameters is None:
+            pass
+        else:
+            body.algorithm_parameters = self.algorithm_parameters.build()
+
+        return body.to_dict()
+
+
