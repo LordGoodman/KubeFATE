@@ -462,51 +462,38 @@ class PiplineBuilder():
 
     def build(self):
         return self._pipline
-    
-    
-    
-class Config(object):
+
+
+class Initiator():
+    """Define initiator in configuration of job"""
 
     def __init__(self):
-        self.initiator = None
-        self.job_parameters = None
-        self.role = None
-        self.role_parameters = None
-        self.algorithm_parameters = None
+        self._role = None
+        self._party_id = None
 
     def to_dict(self) -> dict:
-        body = dict()
-        if self.initiator is None:
-            pass
-        else:
-            body["initiator"] = self.initiator
+        """ Return dictionary
 
-        if self.job_parameters is None:
-            pass
-        else:
-            body["job_parameters"] = self.job_parameters
+        :rtype: dict
 
-        if self.role is None:
-            pass
-        else:
-            body["role"] = self.role
+        """
+        name = 'initiator'
+        body = {
+            'role': self._role,
+            'party_id': self._party_id
+        }
 
-        if self.role_parameters is None:
-            pass
-        else:
-            body["role_parameters"] = self.role_parameters
-
-        if self.algorithm_parameters is None:
-            pass
-        else:
-            body["algorithm_parameters"] = self.algorithm_parameters
-        return body
+        return {name: body}
 
 
 class InitiatorBuilder(object):
+    """Build Initiator instance"""
+
     def __init__(self):
-        self.role = None
-        self.party_id = None
+        self.reset()
+
+    def reset(self):
+        self._initiator = Initiator()
 
     def with_role(self, role: str) -> object:
         """
@@ -514,7 +501,7 @@ class InitiatorBuilder(object):
         :param role:
         :return:
         """
-        self.role = role
+        self._initiator._role = role
         return self
 
     def with_party_id(self, part_id: int) -> object:
@@ -523,39 +510,99 @@ class InitiatorBuilder(object):
         :param part_id:
         :return:
         """
-        self.party_id = part_id
+        self._initiator._party_id = part_id
         return self
 
-    def build(self) -> dict:
+    def build(self) -> object:
         """
 
         :return:
         """
-        body = dict()
-        if self.role is None:
-            pass
-        else:
-            body["role"] = self.role
-
-        if self.party_id is None:
-            pass
-        else:
-            body["part_id"] = self.party_id
-
-        return body
+        initiator = self._initiator
+        self.reset()
+        return initiator
 
 
-class JobParameterBuilder(object):
+class JobParameters():
+    """Define job parameters in configuration of job"""
+
     def __init__(self):
-        self.work_mode = None
+        self._work_mode = 1
+        self._job_type = None
+        self._model_id = None
+        self._model_version = None
+
+    def to_dict(self):
+        """ Return dictionary
+
+        :rtype: dict
+
+        """
+
+        name = 'job_parameters'
+        body = {
+            'work_mode': self._work_mode
+        }
+
+        if self._job_type is not None:
+            body['job_type'] = self._job_type
+
+        if self._model_id is not None:
+            body['model_id'] = self._model_id
+
+        if self._model_version is not None:
+            body['model_version'] = self._model_version
+
+        return {name: body}
+
+
+class JobParametersBuilder(object):
+    """Build JobParameters instance"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self._job_parameters = JobParameters()
 
     def with_work_mode(self, work_mode: int) -> object:
         """
 
         :param work_mode:
+        :type work_mode: int
         :return:
+
         """
-        self.work_mode = work_mode
+        self._job_parameters._work_mode = work_mode
+        return self
+
+    def with_job_type(self, job_type: str) -> object:
+        """
+
+        :param job_type:
+        :type job_type: string
+        :return:
+
+        """
+
+        self._job_parameters._job_type = job_type
+        return self
+
+    def with_model_id(self, model_id: str) -> object:
+        """
+
+        :param model_id: id of model
+
+        """
+        self._job_parameters._model_id = model_id
+        return self
+
+    def with_model_version(self, model_version: str) -> object:
+        """
+        :param model_version: version of model
+
+        """
+        self._job_parameters._model_version = model_version
         return self
 
     def build(self) -> dict:
@@ -563,335 +610,359 @@ class JobParameterBuilder(object):
 
         :return:
         """
-        body = dict()
-        if self.work_mode is None:
-            pass
-        else:
-            body["work_mode"] = self.work_mode
-        return body
+        job_parameters = self._job_parameters
+        self.reset()
+        return job_parameters
 
 
-class RoleBuilder(object):
-    def __init__(self):
-        self.guest = []
-        self.host = []
-        self.arbiter = []
-
-    def with_guest(self, guest: int) -> object:
-        """
-
-        :param guest:
-        :return:
-        """
-        self.guest.append(guest)
-        return self
-
-    def with_host(self, host: int) -> object:
-        """
-
-        :param host:
-        :return:
-        """
-        self.host.append(host)
-        return self
-
-    def with_arbiter(self, arbiter: int) -> object:
-        """
-
-        :param arbiter:
-        :return:
-        """
-        self.arbiter.append(arbiter)
-        return self
-
-    def build(self) -> dict:
-        """
-
-        :return:
-        """
-        body = dict()
-        if len(self.guest) != 0:
-            body["guest"] = self.guest
-        if len(self.host) != 0:
-            body["host"] = self.host
-        if len(self.arbiter) != 0:
-            body["arbiter"] = self.arbiter
-        return body
-
-
-def deepSearch(dict1, dict2):
-    for key in dict2.keys():
-        if key not in dict1.keys():
-            dict1[key] = dict2[key]
-        else:
-            deepSearch(dict1[key], dict2[key])
-
-
-class TrainData(dict):
-    """
-    {"name": "breast_b", "namespace": "fate_flow_test_breast"}
-    """
-    pass
-
-
-class RoleParameterBuilder(object):
-    def __init__(self):
-        self.guest = None
-        self.guest_args = None
-        self.guest_args_data = None
-        self.guest_args_data_train_data = []
-        self.guest_dataio_0 = None
-        self.guest_dataio_0_with_label = []
-        self.guest_dataio_0_label_name = []
-        self.guest_dataio_0_label_type = []
-        self.guest_dataio_0_output_format = []
-
-        self.host = None
-        self.host_args = None
-        self.host_args_data = None
-        self.host_args_data_train_data = []
-        self.host_dataio_0 = None
-        self.host_dataio_0_with_label = []
-        self.host_dataio_0_output_format = []
-
-    def with_guest_args_data_train_data(self, train_data: TrainData) -> object:
-        """
-        :param train_data:
-        :return:
-        """
-        self.guest_args_data_train_data.append(train_data)
-        return self
-
-    def with_guest_dataio_0_with_label(self, label: bool) -> object:
-        """
-
-        :param label:
-        :return:
-        """
-        self.guest_dataio_0_with_label.append(label)
-        return self
-
-    def with_guest_dataio_0_label_name(self, name: str) -> object:
-        """
-
-        :param name:
-        :return:
-        """
-        self.guest_dataio_0_label_name.append(name)
-        return self
-
-    def with_guest_dataio_0_label_type(self, type: str) -> object:
-        """
-
-        :param type:
-        :return:
-        """
-        self.guest_dataio_0_label_type.append(type)
-        return self
-
-    def with_guest_dataio_0_output_format(self, format: str) -> object:
-        """
-
-        :param format:
-        :return:
-        """
-        self.guest_dataio_0_output_format.append(format)
-        return self
-
-    def with_host_args_data_train_data(self, train_data: TrainData) -> object:
-        """
-        :param train_data:
-        :return:
-        """
-        self.host_args_data_train_data.append(train_data)
-        return self
-
-    def with_host_dataio_0_with_label(self, label: bool) -> object:
-        """
-
-        :param label:
-        :return:
-        """
-        self.host_dataio_0_with_label.append(label)
-        return self
-
-    def with_host_dataio_0_output_format(self, format: str) -> object:
-        """
-
-        :param format:
-        :return:
-        """
-        self.host_dataio_0_output_format.append(format)
-        return self
-
-    def build(self) -> dict:
-        """
-
-        :return:
-        """
-        body = dict()
-        guest = dict()
-        host = dict()
-        if self.guest_args_data_train_data is None:
-            pass
-        else:
-            temp = dict(
-                args=dict(
-                    data=dict(
-                        train_data=self.guest_args_data_train_data
-                    )
-                )
-            )
-            deepSearch(guest, temp)
-        if len(self.guest_dataio_0_with_label) != 0:
-            temp = dict(
-                dataio_0=dict(
-                    with_label=self.guest_dataio_0_with_label
-                )
-            )
-            deepSearch(guest, temp)
-
-        if len(self.guest_dataio_0_label_name) != 0:
-            temp = dict(
-                dataio_0=dict(
-                    label_name=self.guest_dataio_0_label_name
-                )
-            )
-            deepSearch(guest, temp)
-
-        if len(self.guest_dataio_0_label_type) != 0:
-            temp = dict(
-                dataio_0=dict(
-                    label_type=self.guest_dataio_0_label_type
-                )
-            )
-            deepSearch(guest, temp)
-
-        if len(self.guest_dataio_0_output_format) != 0:
-            temp = dict(
-                dataio_0=dict(
-                    output_format=self.guest_dataio_0_output_format
-                )
-            )
-            deepSearch(guest, temp)
-
-        if self.host_args_data_train_data is None:
-            pass
-        else:
-            temp = dict(
-                args=dict(
-                    data=dict(
-                        train_data=self.host_args_data_train_data
-                    )
-                )
-            )
-            deepSearch(host, temp)
-        if len(self.host_dataio_0_with_label) != 0:
-            temp = dict(
-                dataio_0=dict(
-                    with_label=self.host_dataio_0_with_label
-                )
-            )
-            deepSearch(host, temp)
-
-        if len(self.host_dataio_0_output_format) != 0:
-            temp = dict(
-                dataio_0=dict(
-                    output_format=self.host_dataio_0_output_format
-                )
-            )
-            deepSearch(host, temp)
-
-        body["host"] = host
-        body["guest"] = guest
-        return body
-
-
-class AlgorithmParametersBuilder(object):
+class Role():
+    """Define role in configuration of job"""
 
     def __init__(self):
-        self.algorithm = None
-        self.parameters = None
+        self._guest = []
+        self._host = []
+        self._arbiter = []
 
-    def with_algorithm(self, algorithm: str) -> object:
-        self.algorithm = algorithm
-        return self
+    def to_dict(self):
+        name = 'role'
+        body = {
+            'guest': self._guest,
+            'host': self._host,
+            'arbiter': self._arbiter
+        }
 
-    def with_parameters(self, *parameters) -> object:
+        return {name: body}
+
+
+class RoleBuilder():
+    """Build Role instance"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self._role = Role()
+
+    def with_guest(self, *guests) -> object:
         """
 
-        :param parameters: The available parameters in FATE, for more details please refer to `parameters <https://github.com/FederatedAI/FATE/blob/master/federatedml/conf/default_runtime_conf/logistic_regression_param.json>`
+        :param guest: A list of guests
         :return:
         """
-        self.parameters = parameters
+
+        self._role._guest.extend([d for d in guests])
+        return self
+
+    def with_host(self, *hosts) -> object:
+        """
+
+        :param host: A list of hosts
+        :return:
+        """
+        self._role._host.extend([d for d in hosts])
+        return self
+
+    def with_arbiter(self, *arbiters) -> object:
+        """
+
+        :param arbiter: A list of arbiters
+        :return:
+        """
+        self._role._arbiter.extend([d for d in arbiters])
+        return self
+
+    def build(self) -> object:
+        """
+
+        :return:
+        """
+        role = self._role
+        self.reset()
+        return role
+
+
+class RoleParameters():
+    """Define role_parameters in configuration of job"""
+
+    def __init__(self):
+        self._guest_data = []
+        self._guest_module_config = []
+        self._host_data = []
+        self._host_module_config = []
+
+    def to_dict(self):
+        name = 'role_parameters'
+        body = {
+            'guest': {
+                'args': {
+                    'data': {}
+                }
+            },
+            'host': {
+                'args': {
+                    'data': {}
+                }
+            }
+        }
+
+        for guest_data in self._guest_data:
+            body['guest']['args']['data'].update(guest_data)
+
+        for host_data in self._host_data:
+            body['host']['args']['data'].update(guest_data)
+
+        for guest_module_config in self._guest_module_config:
+            body['guest'].update(guest_module_config)
+
+        for host_module_config in self._host_module_config:
+            body['host'].update(host_module_config)
+
+        return {name: body}
+
+
+class RoleParametersBuilder(object):
+    """Build RoleParameters instance"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self._role_parameters = RoleParameters()
+
+    def _set_data(self, namespaces=[], names=[], data_type='train_data', role='guest'):
+
+        # simple check
+        if len(namespaces) != len(names):
+            raise Exception("The number of namespaces and name is not matched")
+
+        name = data_type
+        body = []
+
+        for ns, n in zip(namespaces, names):
+            body.append({'namespace': ns, 'name': n})
+
+        if role == 'guest':
+            self._role_parameters._guest_data.append({name: body})
+
+        elif role == 'host':
+            self._role_parameters._host_data.append({name: body})
+
+    def with_guest_train_data(self, namespaces=[], names=[]) -> object:
+        """
+
+        :param namespaces: A list of namespace of train data
+        :type namespaces: list
+        :param name: A list of name of train data
+        :type name: list
+
+        :return:
+        """
+        self._set_data(namespaces, names, 'train_data', 'guest')
+
+        return self
+
+    def with_guest_eval_data(self, namespaces=[], names=[]) -> object:
+        """
+
+        :param namespaces: A list of namespace of train data
+        :type namespaces: list
+        :param name: A list of name of train data
+        :type name: list
+
+        :return:
+        """
+        self._set_data(namespaces, names, 'eval_data', 'guest')
+
+        return self
+
+    def with_host_train_data(self, namespaces=[], names=[]) -> object:
+        """
+
+        :param namespaces: A list of namespace of train data
+        :type namespaces: list
+        :param name: A list of name of train data
+        :type name: list
+
+        :return:
+        """
+        self._set_data(namespaces, names, 'train_data', 'host')
+
+        return self
+
+    def with_host_eval_data(self, namespaces=[], names=[]) -> object:
+        """
+
+        :param namespaces: A list of namespace of train data
+        :type namespaces: list
+        :param name: A list of name of train data
+        :type name: list
+
+        :return:
+        """
+        self._set_data(namespaces, names, 'eval_data', 'host')
+
+        return self
+
+    def _set_config(self, modules=[], configs=[], role='guest'):
+        # simple check
+        if len(modules) != len(configs):
+            raise Exception("The number of modules and configs in not matched")
+
+        for m, c in zip(modules, configs):
+            name = m
+            body = c
+
+            if role == 'guest':
+                self._role_parameters._guest_module_config.append({name: body})
+            elif role == 'host':
+                self._role_parameters._host_module_config.append({name: body})
+
+    def with_guest_module_config(self, modules=[], configs=[]):
+        """ Set guest module config
+
+        :param modules: A list of modules
+        :type modules: list
+        :param configs: A list of configs
+        :type configs: list
+        """
+
+        self._set_config(modules, configs, 'guest')
+        return self
+
+    def with_host_module_config(self, modules=[], configs=[]):
+        """ Set guest module config
+
+        :param modules: A list of modules
+        :type modules: list
+        :param configs: A list of configs
+        :type configs: list
+        """
+
+        self._set_config(modules, configs, 'host')
+        return self
+
+    def build(self) -> object:
+        """
+
+        :return:
+        """
+
+        role_parameters = self._role_parameters
+        self.reset()
+        return role_parameters
+
+
+class AlgorithmParameters():
+    """Class to define algorithm_parameters in configuration of job"""
+
+    def __init__(self):
+        self._parameters_list = []
+
+    def to_dict(self):
+        name = 'algorithm_parameters'
+        body = {}
+
+        for parameters in self._parameters_list:
+            body.update(parameters)
+
+        return {name: body}
+
+
+class AlgorithmParametersBuilder():
+    """Class to build AlgorithmParameters instance"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self._algorithm_parameters = AlgorithmParameters()
+
+    def with_module_config(self, modules=[], configs=[]):
+        """
+
+        :param modules: The available module in FATE, for more details please refer to `Modules <https://github.com/FederatedAI/FATE/tree/master/federatedml>`
+        :type modules: list
+
+        :param configs: A list of configs, the available module config in FATE, for more details please refer to `parameters <https://github.com/FederatedAI/FATE/blob/master/federatedml/conf/default_runtime_conf>`
+
+        :type confgis: list
+        """
+        if len(modules) != len(configs):
+            raise Exception("The number of modules and configs is not matched")
+
+        for m, c in zip(modules, configs):
+            self._algorithm_parameters._parameters_list.append({m: c})
+
         return self
 
     def build(self):
-        if self.algorithm is None:
-            raise Exception("algorithm Can't for None")
+        algorithm_parameters = self._algorithm_parameters
+        self.reset()
+        return algorithm_parameters
 
-        body = dict()
-        body[self.algorithm] = dict()
-        for item in self.parameters:
-            deepSearch(body[self.algorithm], item)
-        return body
+
+class Config(object):
+    """Define configuration of job"""
+
+    def __init__(self):
+        self._initiator = None
+        self._job_parameters = None
+        self._role = None
+        self._role_parameters = None
+        self._algorithm_parameters = None
+
+    def to_dict(self) -> dict:
+
+        result = {}
+
+        if self._initiator is not None:
+            result.update(self._initiator.to_dict())
+
+        if self._job_parameters is not None:
+            result.update(self._job_parameters.to_dict())
+
+        if self._role is not None:
+            result.update(self._role.to_dict())
+
+        if self._role_parameters is not None:
+            result.update(self._role_parameters.to_dict())
+
+        if self._algorithm_parameters is not None:
+            result.update(self._algorithm_parameters.to_dict())
+
+        return result
 
 
 class ConfigBuilder(object):
+    """Class to build Config instance"""
+
     def __init__(self):
-        self.initiator = None
-        self.job_parameters = None
-        self.role = None
-        self.role_parameters = None
-        self.algorithm_parameters = None
+        self.reset()
 
-    def with_initiator(self, initiator: InitiatorBuilder) -> object:
-        self.initiator = initiator
+    def reset(self):
+        self._config = Config()
+
+    def with_initiator(self, initiator: Initiator) -> object:
+        self._config._initiator = initiator
         return self
 
-    def with_job_parameters(self, job_parameters: JobParameterBuilder) -> object:
-        self.job_parameters = job_parameters
+    def with_job_parameters(self, job_parameters: JobParameters) -> object:
+        self._config._job_parameters = job_parameters
         return self
 
-    def with_role(self, role: RoleBuilder) -> object:
-        self.role = role
+    def with_role(self, role: Role) -> object:
+        self._config._role = role
         return self
 
-    def with_role_parameters(self, role_parameters: RoleParameterBuilder) -> object:
-        self.role_parameters = role_parameters
+    def with_role_parameters(self, role_parameters: RoleParameters) -> object:
+        self._config._role_parameters = role_parameters
         return self
 
-    def with_algorithm_parameters(self, algorithm_parameters: AlgorithmParametersBuilder) -> object:
-        self.algorithm_parameters = algorithm_parameters
+    def with_algorithm_parameters(self, algorithm_parameters: AlgorithmParameters) -> object:
+        self._config._algorithm_parameters = algorithm_parameters
         return self
 
-    def build(self) -> dict:
-        body = Config()
-        if self.initiator is None:
-            pass
-        else:
-            body.initiator = self.initiator.build()
-
-        if self.job_parameters is None:
-            pass
-        else:
-            body.job_parameters = self.job_parameters.build()
-
-        if self.role is None:
-            pass
-        else:
-            body.role = self.role.build()
-
-        if self.role_parameters is None:
-            pass
-        else:
-            body.role_parameters = self.role_parameters.build()
-
-        if self.algorithm_parameters is None:
-            pass
-        else:
-            body.algorithm_parameters = self.algorithm_parameters.build()
-
-        return body.to_dict()
-
-
+    def build(self) -> object:
+        config = self._config
+        self.reset()
+        return config
