@@ -81,7 +81,7 @@ pipline_str = '''
 
 # Pipline
 data_io = ComponentBuilder().with_name('dataio_0').with_module(
-    'DataIO').with_input_data('arg.train_data').with_output_data('train').with_output_model(
+    'DataIO').with_input_data('args.train_data').with_output_data('train').with_output_model(
     'dataio').with_need_deploy(True).build()
 
 hetero_feature_selection = ComponentBuilder().with_name('hetero_feature_selection_0').with_module(
@@ -213,3 +213,63 @@ rho = json.loads(config_str)
 pprint.pprint(lho)
 print('------')
 pprint.pprint(rho)
+
+
+# dsl
+secure_add_example = ComponentBuilder()\
+    .with_name('secure_add_example_0')\
+    .with_module('SecureAddExample').build()
+
+
+dsl = PiplineBuilder()\
+    .with_components(
+        secure_add_example).build()
+
+
+# Configuration
+initiator = InitiatorBuilder()\
+    .with_role("guest")\
+    .with_party_id(9999).build()
+
+
+job_parameters = JobParametersBuilder()\
+    .with_work_mode(1).build()
+
+role = RoleBuilder()\
+    .with_guest(9999)\
+    .with_host(9999).build()
+
+secure_add_example_guest_config = {
+    "seed": [
+        123
+    ]
+}
+
+
+secure_add_example_host_config = {
+    "seed": [
+        321
+    ]
+}
+role_parameters = RoleParametersBuilder()\
+    .with_host_module_config(modules=['secure_add_example_0'], configs=[secure_add_example_host_config])\
+    .with_guest_module_config(modules=['secure_add_example_0'], configs=[secure_add_example_guest_config]).build()
+
+secure_add_example = {
+    "partition": 10,
+    "data_num": 1000
+}
+
+
+algorithm_parameters = AlgorithmParametersBuilder()\
+    .with_module_config(modules=['secure_add_example_0'], configs=[secure_add_example]).build()
+
+config = ConfigBuilder()\
+    .with_initiator(initiator)\
+    .with_job_parameters(job_parameters)\
+    .with_role(role)\
+    .with_role_parameters(role_parameters)\
+    .with_algorithm_parameters(algorithm_parameters).build()
+
+pprint.pprint(config.to_dict())
+pprint.pprint(dsl.to_dict())

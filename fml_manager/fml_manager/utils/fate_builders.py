@@ -338,8 +338,10 @@ class Component():
             outputs['output']['model'] = self._output_model
 
         body.update(module)
-        body.update(inputs)
-        body.update(outputs)
+        if inputs != {'input': {}}:
+            body.update(inputs)
+        if outputs != {'output': {}}:
+            body.update(outputs)
         body.update(need_deploy)
 
         return {name: body}
@@ -716,6 +718,12 @@ class RoleParameters():
 
         for host_module_config in self._host_module_config:
             body['host'].update(host_module_config)
+
+        if body['guest']['args']['data'] == {}:
+            body['guest'].pop('args')
+
+        if body['host']['args']['data'] == {}:
+            body['host'].pop('args')
 
         return {name: body}
 

@@ -115,8 +115,8 @@ class FMLManager:
         :rtype: dict
 
         """
-        post_data = {'job_dsl': dsl.to_dict(),
-                     'job_runtime_conf': config.to_dict()}
+        post_data = {'job_dsl': dsl,
+                     'job_runtime_conf': config}
         response = requests.post(
             "/".join([self.server_url, "job", "submit"]), json=post_data)
 
