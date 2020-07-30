@@ -8,7 +8,6 @@ Welcome to KubeFATE's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: hahah
 
 
 Indices and tables
