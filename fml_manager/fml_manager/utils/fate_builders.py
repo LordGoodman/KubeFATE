@@ -709,7 +709,7 @@ class RoleParameters():
             body['guest']['args']['data'].update(guest_data)
 
         for host_data in self._host_data:
-            body['host']['args']['data'].update(guest_data)
+            body['host']['args']['data'].update(host_data)
 
         for guest_module_config in self._guest_module_config:
             body['guest'].update(guest_module_config)
