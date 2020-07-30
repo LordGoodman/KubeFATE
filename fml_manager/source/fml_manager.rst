@@ -1,29 +1,29 @@
-fml\_manager.utils package
-==========================
+fml\_manager package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   fml_manager.utils
 
 Submodules
 ----------
 
-fml\_manager.utils.core module
-------------------------------
+fml\_manager.fml\_cluster\_manager module
+-----------------------------------------
 
-.. automodule:: fml_manager.utils.core
+.. automodule:: fml_manager.fml_cluster_manager
    :members:
    :undoc-members:
    :show-inheritance:
 
-fml\_manager.utils.fate\_builders module
-----------------------------------------
+fml\_manager.fml\_manager module
+--------------------------------
 
-.. automodule:: fml_manager.utils.fate_builders
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-fml\_manager.utils.file\_utils module
--------------------------------------
-
-.. automodule:: fml_manager.utils.file_utils
+.. automodule:: fml_manager.fml_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -32,7 +32,7 @@ fml\_manager.utils.file\_utils module
 Module contents
 ---------------
 
-.. automodule:: fml_manager.utils
+.. automodule:: fml_manager
    :members:
    :undoc-members:
    :show-inheritance:
