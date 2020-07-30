@@ -21,7 +21,7 @@ __mtime__ = '2020-07-30'
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../fml_manager'))
-sys.path.insert(0, os.path.abspath('../../fml_manager/utils'))
+print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'KubeFATE'
@@ -48,7 +48,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    'sphinx.ext.mathjax'
+    'sphinx.ext.mathjax',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
