@@ -21,6 +21,7 @@ __mtime__ = '2020-07-30'
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../fml_manager'))
+print(sys.path)
 # -- Project information -----------------------------------------------------
 
 project = 'KubeFATE'
