@@ -153,7 +153,7 @@ class FMLManager:
 
         return self.submit_job(dsl_data, config_data)
 
-    def query_job_status(self, query_conditions):
+    def query_job_status(self, query_conditions, max_tries=200):
         """ Fetch status of job
 
         :param query_conditions: Condition of the job
@@ -164,7 +164,7 @@ class FMLManager:
 
         """
         job_status = "failed"
-        for i in range(500):
+        for i in range(max_tries):
             time.sleep(1)
             try:
                 guest_status = self.query_job(query_conditions).json()[
