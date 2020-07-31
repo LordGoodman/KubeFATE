@@ -11,7 +11,7 @@
 # limitations under the License.
 
 from fml_manager import ClusterManager
-from fml_manager import PartyBuilder, PartyType
+from fml_manager import Party, PartyType
 
 if __name__ == "__main__":
     # init the cluster manager
@@ -24,20 +24,20 @@ if __name__ == "__main__":
     print(route_table.get_party())
 
     # delete route table party
-    route_table.remove_party('9999', '8888')
+    party_id_1 = '9999'
+    party_id_2 = '8888'
+    route_table.remove_party(party_id_1, party_id_2)
     print(route_table.get_party())
 
     # define normal party
-    party = PartyBuilder().with_id(
-        '9999').with_ip('192.168.2.2').with_port(30010).build()
+    party = Party(p_id='9999', ip='192.168.2.2', port=30010)
 
     # append normal party to route table
     route_table.add_party(party)
     print(route_table.get_party())
 
     # define exchange
-    party = PartyBuilder().with_id('any').with_ip(
-        '192.168.1.2').with_port(30009).with_type(PartyType.EXCHANGE).build()
+    party = Party(ip='192.168.2.2', port=30009, p_type=PartyType.EXCHANGE)
 
     # append exchange to route table
     route_table.add_party(party)

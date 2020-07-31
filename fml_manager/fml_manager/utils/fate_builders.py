@@ -18,20 +18,23 @@ class PartyType(Enum):
 class Party():
     """Party is used to define route table record"""
 
-    def __init__(self) -> None:
+    def __init__(self, p_id='', ip=None, port=None, p_type=PartyType.NORMAL) -> None:
         """ Return default party instance"""
 
         #: ID of the party
-        self._id = None
+        if p_type is PartyType.EXCHANGE:
+            self._id = 'default'
+        else:
+            self._id = p_id
 
         #: IP address of the party
-        self._ip = None
+        self._ip = ip
 
         #: Service port of the party
-        self._port = None
+        self._port = port
 
         #: Type of the party
-        self._type = PartyType.NORMAL
+        self._type = p_type
 
     def set_id(self, party_id) -> None:
         """ Set party ID
