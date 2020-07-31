@@ -440,25 +440,28 @@ class ComponentBuilder():
         return component
 
 
-class Pipline():
+class Pipeline():
     """Pipline is used to described pipline in FATE"""
 
-    def __init__(self):
+    def __init__(self, *components):
         self._name = 'components'
         self._components = {}
+
+        for component in components:
+            self._components.update(component)
 
     def to_dict(self):
         return {self._name: self._components}
 
 
-class PiplineBuilder():
+class PipelineBuilder():
     """PiplineBuilder is used to build pipline instance"""
 
     def __init__(self):
         self.reset()
 
     def reset(self):
-        self._pipline = Pipline()
+        self._pipline = Pipeline()
 
     def with_components(self, *components):
         for component in components:
