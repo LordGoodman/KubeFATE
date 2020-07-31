@@ -448,7 +448,7 @@ class Pipeline():
         self._components = {}
 
         for component in components:
-            self._components.update(component)
+            self._components.update(component.to_dict())
 
     def to_dict(self):
         return {self._name: self._components}

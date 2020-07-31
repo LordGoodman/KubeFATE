@@ -3,7 +3,7 @@ import pprint
 from fml_manager import *
 
 # hetero lr
-pipline_str = '''
+pipeline_str = '''
 {
     "components" : {
         "dataio_0": {
@@ -79,7 +79,7 @@ pipline_str = '''
 '''
 
 
-# Pipline
+# pipeline
 data_io = ComponentBuilder().with_name('dataio_0').with_module(
     'DataIO').with_input_data('args.train_data').with_output_data('train').with_output_model(
     'dataio').with_need_deploy(True).build()
@@ -98,11 +98,16 @@ hetero_lr = ComponentBuilder().with_name('hetero_lr_0').with_module('HeteroLR').
 evaluation = ComponentBuilder().with_name('evaluation_0').with_module(
     'Evaluation').with_input_data('hetero_lr_0.train').with_output_data('evaluate').build()
 
-pipline = PiplineBuilder().with_components(
-    data_io, hetero_feature_selection, hetero_feature_binning, hetero_lr, evaluation).build()
+pipeline = Pipeline(
+    data_io,
+    hetero_feature_selection,
+    hetero_feature_binning,
+    hetero_lr,
+    evaluation
+)
 
-lho = pipline.to_dict()
-rho = json.loads(pipline_str)
+lho = pipeline.to_dict()
+rho = json.loads(pipeline_str)
 
 pprint.pprint(lho)
 print('------')
@@ -221,9 +226,9 @@ secure_add_example = ComponentBuilder()\
     .with_module('SecureAddExample').build()
 
 
-dsl = PiplineBuilder()\
-    .with_components(
-        secure_add_example).build()
+dsl = Pipeline(
+    secure_add_example
+)
 
 
 # Configuration
