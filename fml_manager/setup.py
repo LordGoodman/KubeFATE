@@ -15,7 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'cachetools==3.0.0',
-        'requests>=2.21.0'
+        'requests>=2.21.0',
+        'pandas>=1.1.0'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

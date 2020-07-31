@@ -20,6 +20,7 @@ import time
 import subprocess
 import tempfile
 
+import pandas as pd
 from contextlib import closing
 from fml_manager.utils import file_utils
 from fml_manager.utils.core import get_lan_ip
@@ -634,6 +635,8 @@ class FMLManager:
 
     def track_component_output_data(self, job_id, role, party_id, component_name):
         """ Track output data of component
+
+        :rtype: pandas.DataFrame
         """
         post_data = {
             "job_id": job_id,
@@ -644,7 +647,11 @@ class FMLManager:
 
         response = requests.post(
             "/".join([self.server_url, "tracking", "component", "output", "data"]), json=post_data)
-        return self.prettify(response, True)
+
+        data = response['data']
+        header = response['meta']['header']
+
+        return pd.DataFrame(data, columns=header)
 
     # Utils
     def prettify(self, response, verbose=False):
