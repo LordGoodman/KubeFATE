@@ -648,8 +648,9 @@ class FMLManager:
         response = requests.post(
             "/".join([self.server_url, "tracking", "component", "output", "data"]), json=post_data)
 
-        data = response['data']
-        header = response['meta']['header']
+        result = response.json()
+        data = result['data']
+        header = result['meta']['header']
 
         return pd.DataFrame(data, columns=header)
 
