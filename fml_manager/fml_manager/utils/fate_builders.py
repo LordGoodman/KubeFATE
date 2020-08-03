@@ -761,11 +761,11 @@ class RoleParameters():
 
         for guest_module_config in self._guest_module_config:
 
-            body['guest']['args']['data'].update(guest_module_config)
+            body['guest'].update(guest_module_config)
 
         for host_module_config in self._host_module_config:
 
-            body['host']['args']['data'].update(host_module_config)
+            body['host'].update(host_module_config)
 
         if body['guest']['args']['data'] == {}:
             body['guest'].pop('args')
