@@ -307,16 +307,16 @@ class Component():
 
         #: The input part contains two sub structures, for more details please refer to `DSL definition <https://github.com/FederatedAI/FATE/blob/master/doc/dsl_conf_setting_guide.rst>`_
         #: They should be list type
-        self._input_data = None
-        self._input_train_data = None
-        self._input_eval_data = None
-        self._input_model = None
-        self._input_isometric_model = None
+        self._input_data = []
+        self._input_train_data = []
+        self._input_eval_data = []
+        self._input_model = []
+        self._input_isometric_model = []
 
         #: The output part also contains two sub structures, for more details please refer to `DSL definition <https://github.com/FederatedAI/FATE/blob/master/doc/dsl_conf_setting_guide.rst>`_
         #: They should be list type
-        self._output_data = None
-        self._output_model = None
+        self._output_data = []
+        self._output_model = []
 
     def to_dict(self):
         """ Convert Component to dictionary
@@ -332,27 +332,27 @@ class Component():
         need_deploy = {'need_deploy': self._need_deploy}
 
         # check all input
-        if self._input_data != None:
+        if len(self._input_data) != 0:
             inputs['input']['data'] = {
                 'data': self._input_data
             }
-        elif self._input_train_data != None:
+        elif len(self._input_train_data) != 0:
             inputs['input']['data'] = {
                 'train_data': self._input_train_data
             }
-        elif self._input_eval_data != None:
+        elif len(self._input_eval_data) != 0:
             inputs['input']['data'] = {
                 'eval_data': self._input_eval_data
             }
 
-        if self._input_model != None:
+        if len(self._input_model) != 0:
             inputs['input']['model'] = self._input_model
-        elif self._input_isometric_model != None:
+        elif len(self._input_isometric_model) != 0:
             inputs['input']['isometric_model'] = self._input_isometric_model
 
-        if self._output_data != None:
+        if len(self._output_data) != 0:
             outputs['output']['data'] = self._output_data
-        if self._output_model != None:
+        if len(self._output_model) != 0:
             outputs['output']['model'] = self._output_model
 
         body.update(module)
@@ -409,44 +409,44 @@ class ComponentBuilder():
     def with_input_data(self, *data):
         """ Set input data
         """
-        self._component._input_data = [d for d in data]
+        self._component._input_data.extend([d for d in data])
         return self
 
     def with_input_train_data(self, *train_data):
         """ Set input data for training
         """
-        self._component._input_train_data = [d for d in train_data]
+        self._component._input_train_data.extend([d for d in train_data])
         return self
 
     def with_input_eval_data(self, *eval_data):
         """ Set input data for evaluation
         """
-        self._component._input_eval_data = [d for d in eval_data]
+        self._component._input_eval_data.extend([d for d in eval_data])
         return self
 
     def with_input_model(self, *model):
         """ Set input model
         """
-        self._component._input_model = [d for d in module]
+        self._component._input_model.extend([d for d in module])
         return self
 
     def with_input_isometric_model(self, *isometric_model):
         """ Set input isometric model
         """
-        self._component._input_isometric_model = [d for d in isometric_model]
+        self._component._input_isometric_model.extend([d for d in isometric_model])
         return self
 
     def with_output_data(self, *data):
         """ Set output data
         """
-        self._component._output_data = [d for d in data]
+        self._component._output_data.extend([d for d in data])
         return self
 
     def with_output_model(self, *model):
         """ Set output model
         """
 
-        self._component._output_model = [d for d in model]
+        self._component._output_model.extend([d for d in model])
         return self
 
     def build(self):
@@ -490,9 +490,9 @@ class PipelineBuilder():
 class Initiator():
     """Define initiator in configuration of job"""
 
-    def __init__(self):
-        self._role = None
-        self._party_id = None
+    def __init__(self, role=None, party_id=None):
+        self._role = role
+        self._party_id = party_id
 
     def to_dict(self) -> dict:
         """ Return dictionary
