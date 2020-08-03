@@ -296,11 +296,11 @@ class Component():
     # TODO: add setter/getter
     """Component is used to describe steps in a pipline"""
 
-    def __init__(self):
+    def __init__(self, name='', module=''):
         """ Init an empty component
         """
-        self._name = None
-        self._module = None
+        self._name = name
+        self._module = module
 
         #: Need deploy of data io
         self._need_deploy = True
@@ -406,43 +406,44 @@ class ComponentBuilder():
         self._component._module = module
         return self
 
-    def with_input_data(self, *data):
+    def add_input_data(self, *data):
         """ Set input data
         """
         self._component._input_data.extend([d for d in data])
         return self
 
-    def with_input_train_data(self, *train_data):
+    def add_input_train_data(self, *train_data):
         """ Set input data for training
         """
         self._component._input_train_data.extend([d for d in train_data])
         return self
 
-    def with_input_eval_data(self, *eval_data):
+    def add_input_eval_data(self, *eval_data):
         """ Set input data for evaluation
         """
         self._component._input_eval_data.extend([d for d in eval_data])
         return self
 
-    def with_input_model(self, *model):
+    def add_input_model(self, *model):
         """ Set input model
         """
         self._component._input_model.extend([d for d in module])
         return self
 
-    def with_input_isometric_model(self, *isometric_model):
+    def add_input_isometric_model(self, *isometric_model):
         """ Set input isometric model
         """
-        self._component._input_isometric_model.extend([d for d in isometric_model])
+        self._component._input_isometric_model.extend(
+            [d for d in isometric_model])
         return self
 
-    def with_output_data(self, *data):
+    def add_output_data(self, *data):
         """ Set output data
         """
         self._component._output_data.extend([d for d in data])
         return self
 
-    def with_output_model(self, *model):
+    def add_output_model(self, *model):
         """ Set output model
         """
 
@@ -549,11 +550,11 @@ class InitiatorBuilder(object):
 class JobParameters():
     """Define job parameters in configuration of job"""
 
-    def __init__(self):
+    def __init__(self, work_mode=1, job_type=None, model_id=None, model_version=None):
         self._work_mode = 1
-        self._job_type = None
-        self._model_id = None
-        self._model_version = None
+        self._job_type = job_type
+        self._model_id = model_id
+        self._model_version = model_version
 
     def to_dict(self):
         """ Return dictionary
@@ -666,7 +667,19 @@ class RoleBuilder():
     def reset(self):
         self._role = Role()
 
-    def with_guest(self, *guests) -> object:
+    def add_guest(self, party_id=''):
+        self._role._guest.append(party_id)
+        return self
+
+    def add_host(self, party_id=''):
+        self._role._host.append(party_id)
+        return self
+
+    def add_arbiter(self, party_id=''):
+        self._role._arbiter.append(party_id)
+        return self
+
+    def with_guests(self, *guests) -> object:
         """
 
         :param guest: A list of guests
@@ -676,7 +689,7 @@ class RoleBuilder():
         self._role._guest.extend([d for d in guests])
         return self
 
-    def with_host(self, *hosts) -> object:
+    def with_hosts(self, *hosts) -> object:
         """
 
         :param host: A list of hosts
@@ -685,7 +698,7 @@ class RoleBuilder():
         self._role._host.extend([d for d in hosts])
         return self
 
-    def with_arbiter(self, *arbiters) -> object:
+    def with_arbiters(self, *arbiters) -> object:
         """
 
         :param arbiter: A list of arbiters
@@ -729,16 +742,30 @@ class RoleParameters():
         }
 
         for guest_data in self._guest_data:
-            body['guest']['args']['data'].update(guest_data)
+            key = list(guest_data.keys())[0]
+            value = guest_data[key]
+
+            if body['guest']['args']['data'].get(key) != None:
+                body['guest']['args']['data'][key].extend(value)
+            else:
+                body['guest']['args']['data'].update(guest_data)
 
         for host_data in self._host_data:
-            body['host']['args']['data'].update(host_data)
+            key = list(host_data.keys())[0]
+            value = host_data[key]
+
+            if body['host']['args']['data'].get(key) != None:
+                body['host']['args']['data'][key].extend(value)
+            else:
+                body['host']['args']['data'].update(host_data)
 
         for guest_module_config in self._guest_module_config:
-            body['guest'].update(guest_module_config)
+
+            body['guest']['args']['data'].update(guest_module_config)
 
         for host_module_config in self._host_module_config:
-            body['host'].update(host_module_config)
+
+            body['host']['args']['data'].update(host_module_config)
 
         if body['guest']['args']['data'] == {}:
             body['guest'].pop('args')
@@ -758,116 +785,117 @@ class RoleParametersBuilder(object):
     def reset(self):
         self._role_parameters = RoleParameters()
 
-    def _set_data(self, namespaces=[], names=[], data_type='train_data', role='guest'):
+    def _set_data(self, namespace='', name='', data_type='train_data', role='guest'):
 
         # simple check
-        if len(namespaces) != len(names):
-            raise Exception("The number of namespaces and name is not matched")
+        # if len(namespaces) != len(names):
+        #    raise Exception("The number of namespaces and name is not matched")
 
-        name = data_type
-        body = []
+        key = data_type
+        body = [{'namespace': namespace,
+                 'name': name}]
 
-        for ns, n in zip(namespaces, names):
-            body.append({'namespace': ns, 'name': n})
+        # for ns, n in zip(namespaces, names):
+        # body.append({'namespace': namespace, 'name': name})
 
         if role == 'guest':
-            self._role_parameters._guest_data.append({name: body})
+            self._role_parameters._guest_data.append({key: body})
 
         elif role == 'host':
-            self._role_parameters._host_data.append({name: body})
+            self._role_parameters._host_data.append({key: body})
 
-    def with_guest_train_data(self, namespaces=[], names=[]) -> object:
+    def add_guest_train_data(self, namespace='', name='') -> object:
         """
 
-        :param namespaces: A list of namespace of train data
-        :type namespaces: list
-        :param name: A list of name of train data
-        :type name: list
+        :param namespaces: The namespace of train data
+        :type namespaces: string
+        :param name: The name of train data
+        :type name: string
 
         :return:
         """
-        self._set_data(namespaces, names, 'train_data', 'guest')
+        self._set_data(namespace, name, 'train_data', 'guest')
 
         return self
 
-    def with_guest_eval_data(self, namespaces=[], names=[]) -> object:
+    def add_guest_eval_data(self, namespace='', name='') -> object:
         """
 
-        :param namespaces: A list of namespace of train data
-        :type namespaces: list
-        :param name: A list of name of train data
-        :type name: list
+        :param namespaces: The namespace of train data
+        :type namespaces: string
+        :param name: The name of train data
+        :type name: string
 
         :return:
         """
-        self._set_data(namespaces, names, 'eval_data', 'guest')
+        self._set_data(namespace, name, 'eval_data', 'guest')
 
         return self
 
-    def with_host_train_data(self, namespaces=[], names=[]) -> object:
+    def add_host_train_data(self, namespace='', name='') -> object:
         """
 
-        :param namespaces: A list of namespace of train data
-        :type namespaces: list
-        :param name: A list of name of train data
-        :type name: list
+        :param namespaces: The namespace of train data
+        :type namespaces: string
+        :param name: The name of train data
+        :type name: string
 
         :return:
         """
-        self._set_data(namespaces, names, 'train_data', 'host')
+        self._set_data(namespace, name, 'train_data', 'host')
 
         return self
 
-    def with_host_eval_data(self, namespaces=[], names=[]) -> object:
+    def add_host_eval_data(self, namespace='', name='') -> object:
         """
 
-        :param namespaces: A list of namespace of train data
-        :type namespaces: list
-        :param name: A list of name of train data
-        :type name: list
+        :param namespaces: The namespace of train data
+        :type namespaces: string
+        :param name: The name of train data
+        :type name: string
 
         :return:
         """
-        self._set_data(namespaces, names, 'eval_data', 'host')
+        self._set_data(namespace, name, 'eval_data', 'host')
 
         return self
 
-    def _set_config(self, modules=[], configs=[], role='guest'):
+    def _set_config(self, module='', config={}, role='guest'):
         # simple check
-        if len(modules) != len(configs):
-            raise Exception("The number of modules and configs in not matched")
+        # if len(modules) != len(configs):
+        #    raise Exception("The number of modules and configs in not matched")
 
-        for m, c in zip(modules, configs):
-            name = m
-            body = c
+        # for m, c in zip(modules, configs):
+        key = module
+        body = config
 
-            if role == 'guest':
-                self._role_parameters._guest_module_config.append({name: body})
-            elif role == 'host':
-                self._role_parameters._host_module_config.append({name: body})
+        if role == 'guest':
+            self._role_parameters._guest_module_config.append({key: body})
+        elif role == 'host':
+            self._role_parameters._host_module_config.append({key: body})
 
-    def with_guest_module_config(self, modules=[], configs=[]):
+    def add_guest_module_config(self, module='', config={}):
         """ Set guest module config
 
-        :param modules: A list of modules
-        :type modules: list
-        :param configs: A list of configs
-        :type configs: list
+        :param modules: The modules
+        :type modules: str
+        :param configs: The configs
+        :type configs: dict
         """
 
-        self._set_config(modules, configs, 'guest')
+        self._set_config(module, config, 'guest')
         return self
 
-    def with_host_module_config(self, modules=[], configs=[]):
+    def add_host_module_config(self, module='', config={}):
         """ Set guest module config
 
-        :param modules: A list of modules
-        :type modules: list
-        :param configs: A list of configs
-        :type configs: list
+        :param modules: The modules
+        :type modules: str
+        :param configs: The configs
+        :type configs: dict
         """
 
-        self._set_config(modules, configs, 'host')
+        self._set_config(module, config, 'host')
         return self
 
     def build(self) -> object:
@@ -906,7 +934,7 @@ class AlgorithmParametersBuilder():
     def reset(self):
         self._algorithm_parameters = AlgorithmParameters()
 
-    def with_module_config(self, modules=[], configs=[]):
+    def add_module_config(self, module='', config={}):
         """
 
         :param modules: The available module in FATE, for more details please refer to `Modules <https://github.com/FederatedAI/FATE/tree/master/federatedml>`
@@ -916,11 +944,12 @@ class AlgorithmParametersBuilder():
 
         :type confgis: list
         """
-        if len(modules) != len(configs):
-            raise Exception("The number of modules and configs is not matched")
+        # if len(modules) != len(configs):
+        #    raise Exception("The number of modules and configs is not matched")
 
-        for m, c in zip(modules, configs):
-            self._algorithm_parameters._parameters_list.append({m: c})
+        # for m, c in zip(modules, configs):
+        #    self._algorithm_parameters._parameters_list.append({m: c})
+        self._algorithm_parameters._parameters_list.append({module: config})
 
         return self
 
@@ -933,12 +962,13 @@ class AlgorithmParametersBuilder():
 class Config(object):
     """Define configuration of job"""
 
-    def __init__(self):
-        self._initiator = None
-        self._job_parameters = None
-        self._role = None
-        self._role_parameters = None
-        self._algorithm_parameters = None
+    def __init__(self, initiator=None, job_parameters=None,
+                 role=None, role_parameters=None, algorithm_parameters=None):
+        self._initiator = initiator
+        self._job_parameters = job_parameters
+        self._role = role
+        self._role_parameters = role_parameters
+        self._algorithm_parameters = algorithm_parameters
 
     def to_dict(self) -> dict:
 
