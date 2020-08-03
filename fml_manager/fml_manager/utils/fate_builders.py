@@ -303,7 +303,7 @@ class Component():
         self._module = None
 
         #: Need deploy of data io
-        self._need_deploy = False
+        self._need_deploy = True
 
         #: The input part contains two sub structures, for more details please refer to `DSL definition <https://github.com/FederatedAI/FATE/blob/master/doc/dsl_conf_setting_guide.rst>`_
         #: They should be list type
