@@ -288,6 +288,9 @@ class QueryCondition():
 
         return self.get_job_id().__str__()
 
+    def to_dict(self):
+        return {'job_id': self._job_id}
+
 
 class Component():
     # TODO: add setter/getter

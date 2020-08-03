@@ -185,7 +185,7 @@ class FMLManager:
         """ Fetch job
 
         :param query_conditions: Condition of the job
-        :type query_conditions: dict
+        :type query_conditions: QueryCondition
 
         :returns: response
         :rtype: dict
@@ -193,7 +193,7 @@ class FMLManager:
         """
 
         response = requests.post(
-            "/".join([self.server_url, "job", "query"]), json=query_conditions)
+            "/".join([self.server_url, "job", "query"]), json=query_conditions.to_dict())
         return self.prettify(response)
 
     def query_job_conf(self, query_conditions):
