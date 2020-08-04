@@ -191,7 +191,7 @@ class RouteTable():
         #: The underlying route table config file
         self._route_table = None
 
-    def add_party(self, *parties) -> None:
+    def add_parties(self, *parties) -> None:
         """ Append parties to route table
 
         :param parties: A list of party instance
@@ -203,7 +203,7 @@ class RouteTable():
             self._route_table['route_table'][party.get_id()] = party.to_entry_point(
             )
 
-    def update_party(self, *parties) -> None:
+    def update_parties(self, *parties) -> None:
         """ Update parties of route table
 
         :param parties: A list of party instance
@@ -215,7 +215,7 @@ class RouteTable():
             self._route_table['route_table'][party.get_id()] = party.to_entry_point(
             )
 
-    def remove_party(self, *party_ids) -> None:
+    def remove_parties(self, *party_ids) -> None:
         """ Remove parties from route table
 
         :param parties: A list of party ID
@@ -227,7 +227,7 @@ class RouteTable():
             if(self._route_table['route_table'].get(party_id) != None):
                 self._route_table['route_table'].pop(party_id)
 
-    def get_party(self) -> dict:
+    def get_parties(self) -> dict:
         """ List all parties
 
         :rtype: dict

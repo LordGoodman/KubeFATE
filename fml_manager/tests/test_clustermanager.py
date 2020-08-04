@@ -9,42 +9,65 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
 
+# %%
 from fml_manager import ClusterManager
 from fml_manager import Party, PartyType
+# For more details about the FMLManager, please refer to https://kubefate.readthedocs.io/README.html
 
-if __name__ == "__main__":
-    # init the cluster manager
-    cluster_manager = ClusterManager("fate-10000", "fate")
 
-    # get route table
-    route_table = cluster_manager.get_route_table()
+# %%
+cluster_manager = ClusterManager(cluster_namespace='fate-10000', cluster_name='fate')
 
-    # show all party
-    print(route_table.get_party())
 
-    # delete route table party
-    party_id_1 = '9999'
-    party_id_2 = '8888'
-    route_table.remove_party(party_id_1, party_id_2)
-    print(route_table.get_party())
+# %%
+# get route table
+route_table = cluster_manager.get_route_table()
 
-    # define normal party
-    party = Party(p_id='9999', ip='192.168.2.2', port=30010)
 
-    # append normal party to route table
-    route_table.add_party(party)
-    print(route_table.get_party())
+# %%
+# show all party
+print(route_table.get_parties())
 
-    # define exchange
-    party = Party(ip='192.168.2.2', port=30009, p_type=PartyType.EXCHANGE)
 
-    # append exchange to route table
-    route_table.add_party(party)
-    print(route_table.get_party())
+# %%
+# delete route table party
+party_id_1 = '9999'
+party_id_2 = '8888'
+route_table.remove_parties(party_id_1, party_id_2)
+print(route_table.get_parties())
 
-    # update route table of configmap
-    cluster_manager.set_route_table(route_table)
 
-    # get entrypoint
-    print(cluster_manager.get_entry_point())
+# %%
+# define normal party
+party = Party(p_id='9999', ip='192.168.2.2', port=30010)
+
+
+# %%
+# append normal party to route table
+route_table.add_parties(party)
+print(route_table.get_parties())
+
+
+# %%
+# define exchange
+party = Party(ip='192.168.2.2', port=30009, p_type=PartyType.EXCHANGE)
+
+
+# %%
+# append exchange to route table
+route_table.add_parties(party)
+print(route_table.get_parties())
+
+
+# %%
+# update route table of configmap
+cluster_manager.set_route_table(route_table)
+
+
+# %%
+# get entrypoint
+print(cluster_manager.get_entry_point())
+
