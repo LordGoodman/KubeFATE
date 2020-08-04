@@ -79,50 +79,44 @@ pipeline_str = '''
 }
 '''
 
-# pipeline
-data_io = ComponentBuilder()\
-    .with_name('dataio_0')\
-    .with_module('DataIO')\
-    .add_input_data('args.train_data1')\
-    .add_output_data('train')\
-    .add_output_model('dataio').build()
+# Pipeline
+data_io = ComponentBuilder(name='dataio_0',
+                           module='DataIO')\
+                           .add_input_data('args.train_data')\
+                           .add_output_data('train')\
+                           .add_output_model('dataio').build()
+        
+hetero_feature_binning = ComponentBuilder(name='hetero_feature_binning_0',
+                                          module='HeteroFeatureBinning')\
+                                          .add_input_data('dataio_0.train')\
+                                          .add_output_data('train')\
+                                          .add_output_model('hetero_feature_binning').build()
 
-hetero_feature_binning = ComponentBuilder()\
-    .with_name('hetero_feature_binning_0')\
-    .with_module('HeteroFeatureBinning')\
-    .add_input_data('dataio_0.train')\
-    .add_output_data('train')\
-    .add_output_model('hetero_feature_binning').build()
+hetero_feature_selection = ComponentBuilder(name='hetero_feature_selection_0',
+                                            module='HeteroFeatureSelection')\
+                                            .add_input_data('hetero_feature_binning_0.train')\
+                                            .add_input_isometric_model('hetero_feature_binning_0.hetero_feature_binning')\
+                                            .add_output_data('train')\
+                                            .add_output_model('selected').build()
 
-hetero_feature_selection = ComponentBuilder()\
-    .with_name('hetero_feature_selection_0')\
-    .with_module('HeteroFeatureSelection')\
-    .add_input_data('hetero_feature_binning_0.train')\
-    .add_input_isometric_model('hetero_feature_binning_0.hetero_feature_binning')\
-    .add_output_data('train')\
-    .add_output_model('selected').build()
+hetero_lr = ComponentBuilder(name='hetero_lr_0',
+                             module='HeteroLR')\
+                             .add_input_train_data('hetero_feature_selection_0.train')\
+                             .add_output_data('train')\
+                             .add_output_model('hetero_lr').build()
 
-hetero_lr = ComponentBuilder()\
-    .with_name('hetero_lr_0')\
-    .with_module('HeteroLR')\
-    .add_input_train_data('hetero_feature_selection_0.train')\
-    .add_output_data('train')\
-    .add_output_model('hetero_lr').build()
-
-evaluation = ComponentBuilder()\
-    .with_name('evaluation_0')\
-    .with_module('Evaluation')\
-    .add_input_data('hetero_lr_0.train')\
-    .add_output_data('evaluate')\
-    .with_need_deploy(False).build()
-
+evaluation = ComponentBuilder(name='evaluation_0',
+                              module='Evaluation',
+                              need_deploy=False)\
+                              .add_input_data('hetero_lr_0.train')\
+                              .add_output_data('evaluate').build()
 pipeline = Pipeline(
-    data_io,
-    hetero_feature_selection,
-    hetero_feature_binning,
-    hetero_lr,
+    data_io, 
+    hetero_feature_selection,  
+    hetero_feature_binning, 
+    hetero_lr, 
     evaluation)
-
+    
 lho = pipeline.to_dict()
 rho = json.loads(pipeline_str)
 
