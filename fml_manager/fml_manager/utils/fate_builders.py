@@ -296,14 +296,14 @@ class Component():
     # TODO: add setter/getter
     """Component is used to describe steps in a pipline"""
 
-    def __init__(self, name='', module=''):
+    def __init__(self, name='', module='', need_deploy=True):
         """ Init an empty component
         """
         self._name = name
         self._module = module
 
         #: Need deploy of data io
-        self._need_deploy = True
+        self._need_deploy = need_deploy
 
         #: The input part contains two sub structures, for more details please refer to `DSL definition <https://github.com/FederatedAI/FATE/blob/master/doc/dsl_conf_setting_guide.rst>`_
         #: They should be list type
@@ -368,14 +368,14 @@ class Component():
 class ComponentBuilder():
     """ComponentBuilder is used to build Component instance"""
 
-    def __init__(self):
+    def __init__(self, name='', module='', need_deploy=True):
         """ Init ComponentBuilder instance
         """
 
-        self.reset()
+        self.reset(name, module, need_deploy)
 
-    def reset(self):
-        self._component = Component()
+    def reset(self, name, module, need_deploy):
+        self._component = Component(name, module, need_deploy)
 
     def with_need_deploy(self, need_deploy):
         """ Set 'need_deploy' for DataIO module
@@ -452,7 +452,7 @@ class ComponentBuilder():
 
     def build(self):
         component = self._component
-        self.reset()
+        self.reset('', '', True)
         return component
 
 
