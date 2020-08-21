@@ -1,6 +1,6 @@
 /*
 * Copyright 2019-2020 VMware, Inc.
-* 
+*
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -10,8 +10,8 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
-* 
-*/
+*
+ */
 package api
 
 import (
@@ -31,6 +31,22 @@ func initUser() error {
 	}
 	return nil
 }
+func initGinEngine() *gin.Engine {
+	r := gin.New()
+
+	r.Use(gin.Recovery())
+
+	// reset caller info level to identify http server log from normal log
+	customizedLog := log.With().CallerWithSkipFrameCount(9).Logger()
+	// use customized logger
+	r.Use(logger.SetLogger(logger.Config{
+		Logger: &customizedLog,
+		UTC:    true,
+	}))
+
+	Router(r)
+	return r
+}
 
 // Run starts the API server
 func Run() {
@@ -48,20 +64,21 @@ func Run() {
 	//}
 
 	// use gin.New() instead
-	r := gin.New()
+	//r := gin.New()
+	r := initGinEngine()
 
 	// use default recovery
-	r.Use(gin.Recovery())
+	// r.Use(gin.Recovery())
 
-	// reset caller info level to identify http server log from normal log
-	customizedLog := log.With().CallerWithSkipFrameCount(9).Logger()
-	// use customized logger
-	r.Use(logger.SetLogger(logger.Config{
-		Logger: &customizedLog,
-		UTC:    true,
-	}))
+	// // reset caller info level to identify http server log from normal log
+	// customizedLog := log.With().CallerWithSkipFrameCount(9).Logger()
+	// // use customized logger
+	// r.Use(logger.SetLogger(logger.Config{
+	// 	Logger: &customizedLog,
+	// 	UTC:    true,
+	// }))
 
-	Router(r)
+	// Router(r)
 
 	address := viper.GetString("server.address")
 	port := viper.GetString("server.port")
@@ -77,4 +94,5 @@ func Run() {
 		log.Error().Err(err).Msg("gin run error, ")
 		return
 	}
+
 }
