@@ -1,0 +1,95 @@
+name: A workflow for docker deploy
+on: [push,pull_request]
+jobs:
+  build:
+    name: Docker deploy action
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: generate config
+      if: success()
+      run: |
+        echo "# config prepare"
+        cd ./docker-deploy
+        host_ip=`ifconfig eth0 | grep "inet" | grep -v inet6 | awk '{ print $2}'`
+        sed -i "/mysql_user=fate/ ! s/user=fate/user=root/g" ./parties.conf
+        sed -i "s/partylist=(10000 9999)/partylist=(10000)/g" ./parties.conf
+        sed -i "s/partyiplist=(192.168.1.1 192.168.1.2)/partyiplist=(${host_ip})/g" ./parties.conf
+        sed -i "s/servingiplist=(192.168.1.1 192.168.1.2)/servingiplist=(${host_ip})/g" ./parties.conf
+        cat ./parties.conf
+        echo "# config prepare is ok"
+        
+        echo "# generate config"
+        bash generate_config.sh
+        echo "# check ./docker-deploy/outputs"
+        ls ./outputs
+        cd ../
+        echo "# ok"
+
+
+    - name: docker deploy
+      if: success()
+      run: |
+        echo "# config prepare"
+        dir=/data/projects/fate
+        target_party_id=10000
+        target_party_ip=`ifconfig eth0 | grep "inet" | grep -v inet6 | awk '{ print $2}'`
+        sudo mkdir -p $dir
+        sudo rm -f $dir/confs-$target_party_id.tar $dir/serving-$target_party_id.tar
+        echo "# config is ok!"
+
+        echo "# training cluster and serving cluster copy begin"
+        cd ./docker-deploy
+        sudo cp ./outputs/confs-$target_party_id.tar ./outputs/serving-$target_party_id.tar $dir/
+        sudo rm -f ./outputs/confs-$target_party_id.tar ./outputs/serving-$target_party_id.tar
+        echo "# training cluster and serving cluster copy is ok!"
+
+        echo "# training cluster deploy begin"
+        cd $dir
+        sudo tar -xzf confs-$target_party_id.tar
+        cd confs-$target_party_id
+        sudo docker-compose down
+        sudo docker volume rm -f confs-${target_party_id}_shared_dir_examples
+        sudo docker volume rm -f confs-${target_party_id}_shared_dir_federatedml
+        sudo docker-compose up -d
+        cd ../
+        sudo rm -f confs-${target_party_id}.tar
+        echo "# party ${target_party_id} training cluster deploy is ok!"
+        
+        echo "# serving cluster deploy begin"
+        sudo tar -xzf serving-$target_party_id.tar
+        cd serving-$target_party_id
+        sudo docker-compose down
+        sudo docker-compose up -d
+        cd ../
+        sudo rm -f serving-$target_party_id.tar
+        echo "# party $target_party_id serving cluster deploy is ok!"
+
+        echo "# check containers"
+        MAX_TRY=10
+        for (( i=1; i<=$MAX_TRY; i++ ))
+        do
+            result=$(sudo docker ps | wc -l)
+            if [ $result -eq 11 ]
+            then
+                    echo "# containers are ok"
+                    sudo docker ps
+                    # services need some time to prepare
+                    sleep 30s
+                    exit 0
+            fi
+
+            echo "# Currently have containers: $result want 11"
+            sleep 3
+        done
+        echo "# containers run overtime"
+        exit 1
+
+    - name: toy example test
+      if: success()
+      run: |
+        echo "# toy_example test"
+        sudo docker exec confs-10000_python_1 bash -c "source /data/projects/python/venv/bin/activate&&/data/projects/python/venv/bin/python /data/projects/fate/python/examples/toy_example/run_toy_example.py 10000 10000 1"        
+        echo "# test is ok!"
+        

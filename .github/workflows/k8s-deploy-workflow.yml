@@ -1,0 +1,44 @@
+name: A workflow for k8s-deploy
+on: [push,pull_request]
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+          id: go
+      - name: Code
+        uses: actions/checkout@v1
+      - name: Fmt
+        run: |
+          cd ./k8s-deploy/pkg/
+          result=$(gofmt -l . | wc -l)
+          if [ $result -ne 0 ]
+          then
+              gofmt -l .
+              exit 1
+          fi
+          echo "# fmt is ok!"
+          exit 0
+
+  test:
+    # needs: Lint
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+            go-version: 1.14
+      - name: Code
+        uses: actions/checkout@v1
+      - name: Test
+        run: |
+          cd ./k8s-deploy/pkg/api
+          go test
+          # go test router.go router_test.go 
+          # go test job.go job_test.go
+        
