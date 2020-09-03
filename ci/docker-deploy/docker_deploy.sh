@@ -33,7 +33,7 @@ sudo tar -xzf serving-$target_party_id.tar
 cd serving-$target_party_id
 sudo docker-compose down
 sudo docker-compose up -d
-cd $WD 
+cd $WD
 sudo rm -f serving-$target_party_id.tar
 echo "# party $target_party_id serving cluster deploy is ok!"
 echo "# check containers"
@@ -48,7 +48,7 @@ do
 	    echo "$python_status"
 	    if [ "$python_status" = "$EXPECT_PYTHON_STATUS" ]
 	    then
-            	exit 0
+		    exit 0
 	    fi
     fi
     echo "# Currently have containers: $result want 11"

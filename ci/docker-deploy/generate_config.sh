@@ -17,5 +17,5 @@ echo "# generate config"
 bash generate_config.sh
 echo "# check ./docker-deploy/outputs"
 ls ./outputs
-cd $WD 
+cd $WD
 echo "# ok"
