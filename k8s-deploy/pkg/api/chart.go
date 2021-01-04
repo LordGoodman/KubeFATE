@@ -26,6 +26,9 @@ import (
 type Chart struct {
 }
 
+type TestChart struct {
+}
+
 // Router is cluster router definition method
 func (c *Chart) Router(r *gin.RouterGroup) {
 
