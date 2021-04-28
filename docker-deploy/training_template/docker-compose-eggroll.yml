@@ -142,3 +142,15 @@ services:
 
     networks:
       - fate-network
+
+  fatesite:
+    image: "fatesite:v1.0"
+    ports:
+      - "8075:8075"
+    volumes:
+      - ./confs/fatesite/conf:/data/projects/fatesite/conf
+      - ./confs/eggroll/conf:/data/projects/eggroll/conf
+      - ./confs/fate_flow/conf/service_conf.yaml:/data/projects/fate/conf/service_conf.yaml
+      - ./shared_dir/data/fatesite/dataupload:/data/projects/fatesite /dataupload
+    networks:
+      - fate-network

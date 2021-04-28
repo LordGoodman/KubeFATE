@@ -87,6 +87,10 @@ GenerateConfig() {
 			cp -r training_template/backends/eggroll confs-$party_id/confs/
 			cp training_template/docker-compose-eggroll.yml confs-$party_id/docker-compose.yml
 
+			# fatesite
+			sed -i "s#<party_id>#${party_id}#" ./confs-$party_id/confs/fatesite/conf/application-prod.properties
+			sed -i "s#<local_ip>#${party_ip}#" ./confs-$party_id/confs/fatesite/conf/application-prod.properties
+
 			# eggroll config
 			#db connect inf
 			# use the fixed db name here
