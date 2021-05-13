@@ -245,7 +245,7 @@ $(if [ "$exchange_ip" != "" ]; then
 	"
 			else
 				echo " 
-				\"ip\": \"${proxy_ip}\",
+				\"ip\": \"${party_ip}\",
 				\"port\": \"${proxy_port}\"
 	"
 			fi)
@@ -267,11 +267,11 @@ $(for ((j = 0; j < ${#party_list[*]}; j++)); do
 			done)
 		"${party_id}": {
 			"default": [{
-				"ip": "${proxy_ip}",
+				"ip": "${party_ip}",
 				"port": ${proxy_port}
 			}],
 			"fateflow": [{
-				"ip": "${fate_flow_ip}",
+				"ip": "${party_ip}",
 				"port": ${fate_flow_grpc_port}
 			}]
 		}
