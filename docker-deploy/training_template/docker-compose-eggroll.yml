@@ -101,6 +101,7 @@ services:
       - ./confs/fate_flow/conf:/data/projects/fate/conf
       - ./confs/eggroll/conf:/data/projects/fate/eggroll/conf
       - fate_flow_logs:/data/projects/fate/logs
+      - ./shared_dir/data/fatesite/dataupload:/data/projects/fatesite/dataupload
     depends_on:
       - mysql
       - rollsite
@@ -124,7 +125,6 @@ services:
       - shared_dir_examples:/data/projects/fate/examples
       - ./confs/fate_flow/conf:/data/projects/fate/conf
       - ./confs/client/pipeline_conf.yaml:/data/projects/fate/conf/pipeline_conf.yaml
-      - ./shared_dir/data/fatesite/dataupload:/data/projects/fatesite/dataupload
     depends_on:
       - python
     networks:
