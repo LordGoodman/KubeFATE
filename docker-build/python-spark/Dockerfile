@@ -1,5 +1,5 @@
 ARG SOURCE_PREFIX=federatedai
-ARG SOURCE_TAG=1.5.0-release
+ARG SOURCE_TAG=1.6.0-release
 FROM ${SOURCE_PREFIX}/python:${SOURCE_TAG}
 
 RUN rpm --rebuilddb && \
